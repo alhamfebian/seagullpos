@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 
-//using singleton design pattern
 public class ConnectionManager {
 
     private static ConnectionManager connectionManager;
