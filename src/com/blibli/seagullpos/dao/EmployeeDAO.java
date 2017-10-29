@@ -13,7 +13,7 @@ public class EmployeeDAO {
     private Connection connection = null;
     private PreparedStatement ps = null;
 
-    public EmployeeModel authenticateEmployee(String email, String password){
+    public EmployeeModel authenticateUser(String email, String password){
         EmployeeModel employeeModel = null;
 
         try{
