@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EmployeeDAO {
 
@@ -31,6 +33,21 @@ public class EmployeeDAO {
         }
 
         return employeeModel;
+    }
+
+    public List<EmployeeModel> processAllROw(ResultSet rs) throws SQLException{
+        List<EmployeeModel> listEmployee = new ArrayList<>();
+        while(rs.next()){
+            EmployeeModel model = new EmployeeModel();
+            model.setEmployeeEmail(rs.getString("employeeemail"));
+            model.setEmployeeGender(rs.getString("employeegender"));
+            model.setEmployeeId(rs.getString("employeeid"));
+            model.setEmployeeName(rs.getString("employeename"));
+            model.setEmployeePassword(rs.getString("employeepassword"));
+            model.setEmployeeRole(rs.getString("employeerole"));
+            listEmployee.add(model);
+        }
+        return listEmployee;
     }
 
     public EmployeeModel processEmployeeRow(ResultSet rs) throws SQLException{

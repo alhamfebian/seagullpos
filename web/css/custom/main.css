@@ -1,0 +1,40 @@
+html, body{
+    height: 100%;
+    background-color: #cccccc;
+}
+
+body{
+    background: -webkit-linear-gradient(90deg, #16222A 10%, #3A6073 90%); /* Chrome 10+, Saf5.1+ */
+    background:    -moz-linear-gradient(90deg, #16222A 10%, #3A6073 90%); /* FF3.6+ */
+    background:     -ms-linear-gradient(90deg, #16222A 10%, #3A6073 90%); /* IE10 */
+    background:      -o-linear-gradient(90deg, #16222A 10%, #3A6073 90%); /* Opera 11.10+ */
+    background:         linear-gradient(90deg, #16222A 10%, #3A6073 90%); /* W3C */
+}
+
+.container-flex{
+    display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+    display: -ms-flexbox;      /* TWEENER - IE 10 */
+    display: -webkit-flex;     /* NEW - Chrome */
+    display: flex;             /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    -moz-justify-content: center;
+    -webkit-justify-content: center;
+    -ms-justify-content: center;
+    justify-content: center;
+
+    -moz-align-items: center;
+    -webkit-align-items: center;
+    -ms-align-items: center;
+    align-items: center;
+    min-height: 100%;
+}
+
+.login-container{
+    max-width: 100%;
+    min-width: 400px;
+    padding: 2em 3em;
+    background-color: #fff;
+    border-radius: 4px;
+    opacity: .9;
+}
