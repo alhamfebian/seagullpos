@@ -22,17 +22,17 @@
 <body>
     <div class="container-flex">
         <div class="login-container">
-            <form action="" class="login-form">
+            <form action="/login" method="post">
                 <h3>Login</h3>
                 <hr>
                 <div class="form-group">
-                    <label for="user-email">Email</label>
-                    <input type="text" class="form-control" id="user-email" placeholder="Email">
+                    <label for="user-email" class="control-label">Email</label>
+                    <input type="text" class="form-control" id="user-email" name="email" placeholder="Email" autocomplete="off">
                 </div>
 
                 <div class="form-group">
-                    <label for="user-password">Password</label>
-                    <input type="password" class="form-control" id="user-password" placeholder="Password">
+                    <label for="user-password" class="control-label">Password</label>
+                    <input type="password" class="form-control" id="user-password" name="password" placeholder="Password">
                 </div>
 
                 <button class="btn btn-block btn-primary">Login</button>

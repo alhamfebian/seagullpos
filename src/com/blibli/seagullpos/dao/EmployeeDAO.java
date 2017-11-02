@@ -17,17 +17,15 @@ public class EmployeeDAO {
 
     public EmployeeModel authenticateUser(String email, String password){
         EmployeeModel employeeModel = null;
-
         try{
             connection = ConnectionManager.createConnection();
-            final String query = "SELECT * FROM employee WHERE employeeemail = ? AND employeepassword = md5(?)";
+            final String query = "SELECT * FROM employee WHERE employeeemail = ? AND password = md5(?)";
             ps = connection.prepareStatement(query);
             ps.setString(1, email);
             ps.setString(2, password);
 
             ResultSet rs = ps.executeQuery();
             employeeModel = processEmployeeRow(rs);
-
         }catch (SQLException e){
             e.printStackTrace();
         }
@@ -43,8 +41,8 @@ public class EmployeeDAO {
             model.setEmployeeGender(rs.getString("employeegender"));
             model.setEmployeeId(rs.getString("employeeid"));
             model.setEmployeeName(rs.getString("employeename"));
-            model.setEmployeePassword(rs.getString("employeepassword"));
-            model.setEmployeeRole(rs.getString("employeerole"));
+            model.setEmployeePassword(rs.getString("password"));
+            model.setEmployeeRole(rs.getString("role"));
             listEmployee.add(model);
         }
         return listEmployee;
@@ -58,8 +56,8 @@ public class EmployeeDAO {
             employeeModel.setEmployeeGender(rs.getString("employeegender"));
             employeeModel.setEmployeeId(rs.getString("employeeid"));
             employeeModel.setEmployeeName(rs.getString("employeename"));
-            employeeModel.setEmployeePassword(rs.getString("employeepassword"));
-            employeeModel.setEmployeeRole(rs.getString("employeerole"));
+            employeeModel.setEmployeePassword(rs.getString("password"));
+            employeeModel.setEmployeeRole(rs.getString("role"));
         }
         return employeeModel;
     }

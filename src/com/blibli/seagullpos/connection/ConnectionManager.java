@@ -11,7 +11,7 @@ import java.util.Properties;
 public class ConnectionManager {
 
     private static ConnectionManager connectionManager;
-    private static final String url = "jdbc:postgresql://localhost:5432/seagullpos";
+    private static final String url = "jdbc:postgresql://localhost:5432/SeagullPOS";
     private static Properties props;
 
     private ConnectionManager(){
