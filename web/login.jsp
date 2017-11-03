@@ -22,8 +22,8 @@
 <body>
     <div class="container-flex">
         <div class="login-container">
-            <form action="/login" method="post">
-                <h3>Login</h3>
+            <form action="/login" method="post" id="login-form">
+                <h3>Login to Your Account</h3>
                 <hr>
                 <div class="form-group">
                     <label for="user-email" class="control-label">Email</label>
@@ -35,9 +35,20 @@
                     <input type="password" class="form-control" id="user-password" name="password" placeholder="Password">
                 </div>
 
-                <button class="btn btn-block btn-primary">Login</button>
+
+                <c:if test="${not empty errorMessage}">
+                    <div class="error">
+                        <span class="text-danger">${errorMessage}</span>
+                    </div>
+                </c:if>
+
+                <button class="btn btn-block btn-primary" id="btn-login">Login</button>
             </form>
         </div>
     </div>
+
+
+    <script src="js/main/main.js"></script>
+
 </body>
 </html>
