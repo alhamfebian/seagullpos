@@ -3,6 +3,7 @@ package com.blibli.seagullpos.controller;
 import com.blibli.seagullpos.dao.EmployeeDAO;
 import com.blibli.seagullpos.model.EmployeeModel;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -35,7 +36,9 @@ public class LoginController extends HttpServlet {
             }
         }
         else{
-            response.sendRedirect("login.jsp");
+            request.setAttribute("errorMessage", "The email or password you entered is incorrect");
+            RequestDispatcher rd = request.getRequestDispatcher("/login.jsp");
+            rd.forward(request,response);
         }
     }
 
