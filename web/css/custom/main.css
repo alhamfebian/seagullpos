@@ -38,3 +38,7 @@ body{
     border-radius: 4px;
     opacity: .9;
 }
+
+.error{
+    margin-bottom: 15px;
+}
