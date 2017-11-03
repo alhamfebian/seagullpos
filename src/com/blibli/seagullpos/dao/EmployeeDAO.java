@@ -28,6 +28,13 @@ public class EmployeeDAO {
             employeeModel = processEmployeeRow(rs);
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) try {
+                ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         return employeeModel;
