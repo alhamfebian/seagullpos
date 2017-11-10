@@ -1,5 +1,7 @@
 package com.blibli.seagullpos.model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class EmployeeModel {
@@ -65,6 +67,11 @@ public class EmployeeModel {
     }
 
     public void setLastLogin(Date lastLogin) {
+        System.out.println(lastLogin);
         this.lastLogin = lastLogin;
+    }
+
+    public String getFormattedDate(){
+        return new SimpleDateFormat("E dd-MM-yyyy hh:mm:ss").format(getLastLogin());
     }
 }

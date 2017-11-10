@@ -15,9 +15,10 @@ import java.io.IOException;
 @WebServlet("/login")
 public class LoginController extends HttpServlet {
 
-    private EmployeeDAO dao = new EmployeeDAO();
+    private EmployeeDAO dao = null;
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        dao = new EmployeeDAO();
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
@@ -28,7 +29,7 @@ public class LoginController extends HttpServlet {
             session.setAttribute("user", user.getEmployeeName());
             session.setAttribute("email", user.getEmployeeEmail());
             session.setAttribute("role", user.getEmployeeRole());
-
+            session.setAttribute("time", user.getFormattedDate());
             if(user.getEmployeeRole().equals("admin")){
                 response.sendRedirect("dashboard.jsp");
             }else if(user.getEmployeeRole().equals("cashier")){

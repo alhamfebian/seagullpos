@@ -11,6 +11,6 @@
     <title>Seagull POS - Dashboard</title>
 </head>
 <body>
-    ${user}
+    ${time}
 </body>
 </html>
