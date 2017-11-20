@@ -13,10 +13,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="css/bootstrap-3.3.7-dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/custom/main.css">
+    <link rel="stylesheet" href="../css/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/custom/login.css">
 
-    <script src="js/jquery-3.2.1.js"></script>
+    <script src="../js/jquery-3.2.1.js"></script>
 
 </head>
 <body>
@@ -48,7 +48,7 @@
     </div>
 
 
-    <script src="js/main/main.js"></script>
+    <script src="../js/main/main.js"></script>
 
 </body>
 </html>

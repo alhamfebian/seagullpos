@@ -1,7 +1,7 @@
 package com.blibli.seagullpos.service;
 
-import com.blibli.seagullpos.dao.EmployeeDAO;
-import com.blibli.seagullpos.model.EmployeeModel;
+import com.blibli.seagullpos.dao.CategoryDAO;
+import com.blibli.seagullpos.model.CategoryModel;
 import com.google.gson.Gson;
 
 import javax.servlet.ServletException;
@@ -13,22 +13,22 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-@WebServlet("/user")
-public class UserService extends HttpServlet {
-    EmployeeDAO dao = null;
-
-
+@WebServlet(name = "CategoryService")
+public class CategoryService extends HttpServlet {
+    private CategoryDAO categoryDAO = null;
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        dao = new EmployeeDAO();
 
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        dao = new EmployeeDAO();
-        List<EmployeeModel> listAllUser = dao.getAllUser();
-        String listUser = new Gson().toJson(listAllUser);
+        categoryDAO = new CategoryDAO();
+
+        List<CategoryModel> listCategory = categoryDAO.getAllCategory();
+
+        String listCategoryJSON = new Gson().toJson(listCategory);
         PrintWriter pw = response.getWriter();
-        pw.write(listUser);
+
+        pw.write(listCategoryJSON);
     }
 }

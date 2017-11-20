@@ -1,7 +1,7 @@
 package com.blibli.seagullpos.service;
 
-import com.blibli.seagullpos.dao.EmployeeDAO;
-import com.blibli.seagullpos.model.EmployeeModel;
+import com.blibli.seagullpos.dao.ProductDAO;
+import com.blibli.seagullpos.model.ProductModel;
 import com.google.gson.Gson;
 
 import javax.servlet.ServletException;
@@ -11,24 +11,26 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet("/user")
-public class UserService extends HttpServlet {
-    EmployeeDAO dao = null;
+@WebServlet(name = "ProductService")
+public class ProductService extends HttpServlet {
 
-
+    private ProductDAO productdao = null;
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        dao = new EmployeeDAO();
 
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        dao = new EmployeeDAO();
-        List<EmployeeModel> listAllUser = dao.getAllUser();
-        String listUser = new Gson().toJson(listAllUser);
+        productdao = new ProductDAO();
+
+        List<ProductModel> listProduct = productdao.getAllProduct();
+
+        String productJSON = new Gson().toJson(listProduct);
         PrintWriter pw = response.getWriter();
-        pw.write(listUser);
+
+        pw.write(productJSON);
     }
 }

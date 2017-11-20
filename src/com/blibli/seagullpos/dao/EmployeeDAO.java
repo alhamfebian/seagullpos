@@ -4,9 +4,7 @@ import com.blibli.seagullpos.connection.ConnectionManager;
 import com.blibli.seagullpos.model.EmployeeModel;
 
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class EmployeeDAO {
@@ -21,7 +19,6 @@ public class EmployeeDAO {
             e.printStackTrace();
         }
     }
-
 
     public EmployeeModel authenticateUser(String email, String password){
         EmployeeModel employeeModel = null;
@@ -64,6 +61,75 @@ public class EmployeeDAO {
         return  listUser;
     }
 
+
+    public String getLastID(String role){
+        String query = "SELECT employeeid FROM employee WHERE role = ? LIMIT 1";
+        String id = "";
+        try{
+            ps = connection.prepareStatement(query);
+            ps.setString(1, role);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                id = rs.getString(1);
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return id;
+    }
+
+    public boolean insertUser(EmployeeModel employee){
+        String query = "INSERT INTO Employee (employeeid, employeename, employeeemail, employeegender, password, role, lastlogin)" +
+                " VALUES (?, ?, ?, ?, md5(?), ?, ?)";
+
+        boolean insertStatus = false;
+        try{
+            ps = connection.prepareStatement(query);
+            ps.setString(1, employee.getEmployeeId());
+            ps.setString(2, employee.getEmployeeName());
+            ps.setString(3, employee.getEmployeeEmail());
+            ps.setString(4, employee.getEmployeeGender());
+            ps.setString(5, employee.getEmployeePassword());
+            ps.setString(6, employee.getEmployeeRole());
+            ps.setTimestamp(7, null);
+            insertStatus = ps.execute();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return insertStatus;
+    }
+
+    public boolean updateUser(EmployeeModel employee){
+        String query = "UPDATE employee " +
+                "SET " +
+                "employeeID = ?," +
+                "employeeName = ?" +
+                "employeeEmail = ?" +
+                "employeeGender = ?" +
+                "password = md5(?)" +
+                "role = ?" +
+                "WHERE employeeid = ?";
+
+        boolean updateStatus = false;
+
+        try{
+            ps = connection.prepareStatement(query);
+
+            ps.setString(1, employee.getEmployeeId());
+            ps.setString(2, employee.getEmployeeName());
+            ps.setString(3, employee.getEmployeeEmail());
+            ps.setString(4, employee.getEmployeeGender());
+            ps.setString(5, employee.getEmployeePassword());
+            ps.setString(6, employee.getEmployeeRole());
+
+            updateStatus = ps.execute();
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return updateStatus;
+    }
+
     public void updateLoginTime(EmployeeModel employee){
         try{
             connection.setAutoCommit(false);
@@ -89,6 +155,19 @@ public class EmployeeDAO {
         }
     }
 
+    public boolean deleteUser(String employeeID){
+        String query = "DELETE FROM employee WHERE employeeID = ?";
+        boolean deleteStatus = false;
+        try{
+            ps = connection.prepareStatement(query);
+            ps.setString(1, employeeID);
+            deleteStatus = ps.execute();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return deleteStatus;
+    }
+
 
     public List<EmployeeModel> processAllROw(ResultSet rs) throws SQLException{
         List<EmployeeModel> listEmployee = new ArrayList<>();
@@ -100,7 +179,11 @@ public class EmployeeDAO {
             model.setEmployeeName(rs.getString("employeename"));
             model.setEmployeePassword(rs.getString("password"));
             model.setEmployeeRole(rs.getString("role"));
-            model.setLastLogin(rs.getTimestamp("lastlogin"));
+
+            if(rs.getDate("lastlogin") != null)
+                model.setLastLogin(rs.getTimestamp("lastlogin"));
+            else
+                model.setLastLogin(null);
             listEmployee.add(model);
         }
         return listEmployee;
