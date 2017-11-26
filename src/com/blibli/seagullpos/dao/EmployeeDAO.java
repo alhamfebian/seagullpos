@@ -13,16 +13,14 @@ public class EmployeeDAO {
     private PreparedStatement ps = null;
 
     public EmployeeDAO(){
-        try{
-            connection = ConnectionManager.createConnection();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+
     }
 
     public EmployeeModel authenticateUser(String email, String password){
+
         EmployeeModel employeeModel = null;
         try{
+            connection = ConnectionManager.createConnection();
             final String query = "SELECT * FROM employee WHERE employeeemail = ? AND password = md5(?)";
             ps = connection.prepareStatement(query);
             ps.setString(1, email);
@@ -50,22 +48,32 @@ public class EmployeeDAO {
         List<EmployeeModel> listUser = null;
 
         try{
-            String query = "SELECT * FROM employee";
+            connection = ConnectionManager.createConnection();
+            String query = "SELECT * FROM employee ORDER BY employeeid ASC";
             ps = connection.prepareStatement(query);
 
             ResultSet rs = ps.executeQuery();
             listUser = processAllROw(rs);
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) try {
+                ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return  listUser;
     }
 
 
     public String getLastID(String role){
-        String query = "SELECT employeeid FROM employee WHERE role = ? LIMIT 1";
+        String query = "SELECT employeeid FROM employee WHERE role = ? ORDER BY employeeid DESC LIMIT 1";
         String id = "";
+
         try{
+            connection = ConnectionManager.createConnection();
             ps = connection.prepareStatement(query);
             ps.setString(1, role);
             ResultSet rs = ps.executeQuery();
@@ -74,7 +82,15 @@ public class EmployeeDAO {
             }
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) try {
+                ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
+        System.out.println(id);
         return id;
     }
 
@@ -84,6 +100,7 @@ public class EmployeeDAO {
 
         boolean insertStatus = false;
         try{
+            connection = ConnectionManager.createConnection();
             ps = connection.prepareStatement(query);
             ps.setString(1, employee.getEmployeeId());
             ps.setString(2, employee.getEmployeeName());
@@ -95,6 +112,13 @@ public class EmployeeDAO {
             insertStatus = ps.execute();
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) try {
+                ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return insertStatus;
     }
@@ -113,6 +137,7 @@ public class EmployeeDAO {
         boolean updateStatus = false;
 
         try{
+            connection = ConnectionManager.createConnection();
             ps = connection.prepareStatement(query);
 
             ps.setString(1, employee.getEmployeeId());
@@ -126,12 +151,20 @@ public class EmployeeDAO {
 
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) try {
+                ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return updateStatus;
     }
 
     public void updateLoginTime(EmployeeModel employee){
         try{
+            connection = ConnectionManager.createConnection();
             connection.setAutoCommit(false);
             String query = "UPDATE employee " +
                     "SET lastlogin = ?" +
@@ -152,6 +185,13 @@ public class EmployeeDAO {
             } catch (SQLException e1) {
                 e1.printStackTrace();
             }
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) try {
+                ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -159,11 +199,19 @@ public class EmployeeDAO {
         String query = "DELETE FROM employee WHERE employeeID = ?";
         boolean deleteStatus = false;
         try{
+            connection = ConnectionManager.createConnection();
             ps = connection.prepareStatement(query);
             ps.setString(1, employeeID);
             deleteStatus = ps.execute();
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) try {
+                ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return deleteStatus;
     }

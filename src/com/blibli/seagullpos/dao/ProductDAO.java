@@ -43,6 +43,8 @@ public class ProductDAO {
         return listProduct;
     }
 
+
+
     private List<ProductModel> processAllRow(ResultSet rs) throws SQLException{
         List<ProductModel> listProduct = new ArrayList<>();
 

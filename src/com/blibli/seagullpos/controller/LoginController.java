@@ -31,9 +31,9 @@ public class LoginController extends HttpServlet {
             session.setAttribute("role", user.getEmployeeRole());
             session.setAttribute("time", user.getFormattedDate());
             if(user.getEmployeeRole().equals("admin")){
-                response.sendRedirect("dashboard.jsp");
+                response.sendRedirect("view/dashboard.jsp");
             }else if(user.getEmployeeRole().equals("cashier")){
-                response.sendRedirect("cashier.jsp");
+                response.sendRedirect("view/cashier.jsp");
             }
         }
         else{

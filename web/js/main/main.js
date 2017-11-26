@@ -60,3 +60,79 @@ $("#btn-login").click(function (e) {
         $('#login-form').submit();
     }
 });
+
+retrieveData();
+
+function retrieveData(){
+    $.ajax({
+        url : "/user",
+        dataType : "JSON",
+        type : "GET",
+        success : processUserData,
+        error : function () {
+            alert("error");
+        }
+    })
+};
+
+// bad implementation
+$("#btn-register").click(function (e) {
+    e.preventDefault();
+    console.log($("#register-staff-form").serialize());
+
+    if(true){
+        $.ajax({
+            url : "/user",
+            type : "POST",
+            data : $("#register-staff-form").serialize(),
+            success : retrieveData,
+            error : function () {
+                alert("waduh");
+            }
+        })
+    }
+});
+
+
+function processUserData(data) {
+    var listUser = data == null ? [] : data;
+
+    $("#staff-data tbody tr").remove();
+
+    var tableData = $("#staff-data tbody");
+
+    console.log(listUser);
+    $.each(listUser, function (key, value) {
+        tableData.append(
+            "<tr>" +
+            "<td>" + value.employeeId + "</td>" +
+            "<td>" + value.employeeName + "</td>" +
+            "<td>" + value.employeeEmail + "</td>" +
+            "<td>" + value.employeeGender + "</td>" +
+            "<td>" + value.lastLogin + "</td>" +
+            "<td>" + value.employeeRole + "</td>" +
+            "<td>" +
+            "<span class='glyphicon glyphicon-pencil icon-margin cursor-point text-success' id='icon-update-user'></span>" +
+            "<span class='glyphicon glyphicon-trash cursor-point text-warning' id='icon-delete-user'></span>" +
+            "</td>" +
+            "</tr>"
+        )
+    });
+}
+
+
+$("#staff-data").on("click", "#icon-delete-user" ,function () {
+
+    var tr = $(this).parent().parent();
+
+    var staffId = tr.find("td:first").html();
+
+    $.ajax({
+        url : "/user/delete?" + staffId,
+        type : "DELETE",
+        success : retrieveData,
+        error : function () {
+            alert("error");
+        }
+    })
+});

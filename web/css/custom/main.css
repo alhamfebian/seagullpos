@@ -69,6 +69,8 @@ ul, li{
 }
 
 
+
+
 /*utility*/
 
 .icon-margin{
@@ -82,6 +84,14 @@ ul, li{
 
 .letter-space{
     letter-spacing: 2px;
+}
+
+.small-margin-bottom{
+    margin-bottom: 10px;
+}
+
+.cursor-point{
+    cursor: pointer;
 }
 
 /*.inline-block{*/
