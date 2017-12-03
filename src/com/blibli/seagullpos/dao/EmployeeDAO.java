@@ -67,6 +67,29 @@ public class EmployeeDAO {
         return  listUser;
     }
 
+    public List<EmployeeModel> getPaginateUserList(int limit, int offset){
+        List<EmployeeModel> listUser = null;
+        try {
+            connection = ConnectionManager.createConnection();
+            String query = "SELECT * FROM employee ORDER BY employeeid ASC LIMIT ? OFFSET ?";
+            ps = connection.prepareStatement(query);
+            ps.setInt(1, limit);
+            ps.setInt(2, offset);
+            ResultSet rs = ps.executeQuery();
+            listUser = processAllROw(rs);
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) try{
+                ps.close();
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
+        }
+        return listUser;
+    }
 
     public String getLastID(String role){
         String query = "SELECT employeeid FROM employee WHERE role = ? ORDER BY employeeid DESC LIMIT 1";
@@ -123,14 +146,13 @@ public class EmployeeDAO {
         return insertStatus;
     }
 
-    public boolean updateUser(EmployeeModel employee){
+    public boolean updateUserGeneralData(EmployeeModel employee, String currentId){
         String query = "UPDATE employee " +
                 "SET " +
-                "employeeID = ?," +
-                "employeeName = ?" +
-                "employeeEmail = ?" +
-                "employeeGender = ?" +
-                "password = md5(?)" +
+                "employeeid = ?," +
+                "employeename = ?," +
+                "employeeemail = ?," +
+                "employeegender = ?," +
                 "role = ?" +
                 "WHERE employeeid = ?";
 
@@ -144,9 +166,8 @@ public class EmployeeDAO {
             ps.setString(2, employee.getEmployeeName());
             ps.setString(3, employee.getEmployeeEmail());
             ps.setString(4, employee.getEmployeeGender());
-            ps.setString(5, employee.getEmployeePassword());
-            ps.setString(6, employee.getEmployeeRole());
-
+            ps.setString(5, employee.getEmployeeRole().toLowerCase());
+            ps.setString(6, currentId);
             updateStatus = ps.execute();
 
         }catch (SQLException e){
@@ -214,6 +235,32 @@ public class EmployeeDAO {
             }
         }
         return deleteStatus;
+    }
+
+    public List<EmployeeModel> liveSearch(String userQuery){
+        String query = "SELECT * FROM employee WHERE " +
+                "LOWER(employeeid) LIKE " +
+                "LOWER(?)" +
+                " OR " +
+                "LOWER(employeename) LIKE " +
+                "LOWER(?)" +
+                "ORDER BY employeeid ASC ";
+        List<EmployeeModel> searchUsers = null;
+
+        try{
+            connection = ConnectionManager.createConnection();
+            ps = connection.prepareStatement(query);
+            ps.setString(1, "%" + userQuery + "%");
+            ps.setString(2, "%" + userQuery + "%");
+
+            ResultSet rs = ps.executeQuery();
+
+            searchUsers = processAllROw(rs);
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return searchUsers;
     }
 
 

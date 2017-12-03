@@ -67,7 +67,6 @@ public class EmployeeModel {
     }
 
     public void setLastLogin(Date lastLogin) {
-        System.out.println(lastLogin);
         this.lastLogin = lastLogin;
     }
 

@@ -11,7 +11,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +33,18 @@ public class UserService extends HttpServlet {
         return newId;
     }
 
+    private boolean isRoleChange(String id, String role){
+        if(id.substring(0, 2).equals("CH") && role.equals("Admin")) return true;
+        else if(id.substring(0, 2).equals("AD") && role.equals("Cashier")) return true;
+        return false;
+    }
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         dao = new EmployeeDAO();
-        EmployeeModel model = new EmployeeModel();
 
+
+        EmployeeModel model = new EmployeeModel();
         String fullName = request.getParameter("fullname");
         String email = request.getParameter("staffEmail");
         String password = request.getParameter("staffPassword");
@@ -43,7 +52,6 @@ public class UserService extends HttpServlet {
         String selectedGender = gender.equals("Male") ? "Male" : "Female";
         String role = request.getParameter("role");
         String id = generateID(role);
-
 
         model.setEmployeeName(fullName);
         model.setEmployeeEmail(email);
@@ -54,23 +62,46 @@ public class UserService extends HttpServlet {
 
 
         dao.insertUser(model);
-
-        String userJSON = new Gson().toJson(model);
-        response.getWriter().write(userJSON);
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         dao = new EmployeeDAO();
-        List<EmployeeModel> listAllUser = dao.getAllUser();
-        String listUser = new Gson().toJson(listAllUser);
+        List<EmployeeModel> listUser = null;
+        if(request.getPathInfo() == null){
+            listUser = dao.getPaginateUserList(5, 0);
+        }
+        else if(request.getPathInfo().equals("/search")){
+            String searchData = request.getParameter("query");
+            listUser = dao.liveSearch(searchData);
+        }
+
+        String listUserJSON = new Gson().toJson(listUser);
         PrintWriter pw = response.getWriter();
-        pw.write(listUser);
+        pw.write(listUserJSON);
+    }
+
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+        dao = new EmployeeDAO();
+
+        BufferedReader br = request.getReader();
+
+        String json = br.readLine();
+        EmployeeModel employee = new Gson().fromJson(json, EmployeeModel.class);
+
+        String currentId = employee.getEmployeeId();
+        String role = employee.getEmployeeRole();
+        String newId = isRoleChange(currentId, role)
+                ? generateID(role.toLowerCase()) : employee.getEmployeeId();
+
+        employee.setEmployeeId(newId);
+
+        dao.updateUserGeneralData(employee, currentId);
     }
 
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
         dao = new EmployeeDAO();
 
-        String deleteId = request.getQueryString();
+        String deleteId = request.getParameter("id");
 
         dao.deleteUser(deleteId);
     }

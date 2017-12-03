@@ -44,7 +44,7 @@
                                         <li><a href="#">Role</a></li>
                                     </ul>
                                 </div>
-                                <input type="text" class="form-control" name="x" placeholder="Search...">
+                                <input type="text" class="form-control" id="search-item" name="search-item" placeholder="Search...">
                                 <span class="input-group-addon">
                                         <span class="glyphicon glyphicon-search"></span>
                                 </span>

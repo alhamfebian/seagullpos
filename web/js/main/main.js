@@ -61,6 +61,7 @@ $("#btn-login").click(function (e) {
     }
 });
 
+
 retrieveData();
 
 function retrieveData(){
@@ -73,26 +74,68 @@ function retrieveData(){
             alert("error");
         }
     })
-};
+}
 
-// bad implementation
-$("#btn-register").click(function (e) {
-    e.preventDefault();
-    console.log($("#register-staff-form").serialize());
+function insertData(){
+    $.ajax({
+        url : "/user",
+        type : "POST",
+        data : $("#register-staff-form").serialize(),
+        success : retrieveData,
+        error : function () {
+            alert("waduh");
+        }
+    })
+}
 
-    if(true){
-        $.ajax({
-            url : "/user",
-            type : "POST",
-            data : $("#register-staff-form").serialize(),
-            success : retrieveData,
-            error : function () {
-                alert("waduh");
-            }
-        })
-    }
-});
+function searchData(searchValue) {
+    console.log(searchValue);
+    $.ajax({
+        url : "/user/search?query=" + searchValue,
+        dataType : "JSON",
+        type : "GET",
+        success : processUserData,
+        error : function () {
+            alert("error");
+        }
+    })
+}
 
+function updateData(data){
+    console.log(data);
+
+    $.ajax({
+        url : "/user/update?id=" + data.employeeid,
+        type : "PUT",
+        contentType : "application/json",
+        data : JSON.stringify(data),
+        success : retrieveData,
+        error : function (ts) {
+            alert(ts.responseText);
+        }
+    })
+}
+
+function deleteData(staffId){
+    $.ajax({
+        url : "/user/delete?id=" + staffId,
+        type : "DELETE",
+        success : retrieveData,
+        error : function () {
+            alert("error");
+        }
+    })
+}
+
+function formToJSON(tr){
+    var obj = {};
+    tr.find(":input").each(function () {
+        if($(this).val() == 'undefined') obj[$(this).attr('id')] = null;
+        else obj[$(this).attr('id')] = $(this).val();
+    });
+
+    updateData(obj);
+}
 
 function processUserData(data) {
     var listUser = data == null ? [] : data;
@@ -105,34 +148,117 @@ function processUserData(data) {
     $.each(listUser, function (key, value) {
         tableData.append(
             "<tr>" +
-            "<td>" + value.employeeId + "</td>" +
-            "<td>" + value.employeeName + "</td>" +
-            "<td>" + value.employeeEmail + "</td>" +
-            "<td>" + value.employeeGender + "</td>" +
-            "<td>" + value.lastLogin + "</td>" +
-            "<td>" + value.employeeRole + "</td>" +
-            "<td>" +
+            '<td class="col-sm-1 not-editable" data-employee-id="' + value.employeeId + '">' + value.employeeId + "</td>" +
+            '<td class="col-sm-2 editable" data-employee-name="' + value.employeeName + '">' + value.employeeName + "</td>" +
+            '<td class="col-sm-3 editable" data-employee-email="' + value.employeeEmail + '">' + value.employeeEmail + "</td>" +
+            '<td class="col-sm-1 selection" data-employee-gender="' + value.employeeGender + '">' + value.employeeGender + "</td>" +
+            '<td class="col-sm-3 not-editable" data-last-login="' + value.lastLogin + '">' + value.lastLogin + "</td>" +
+            '<td class="col-sm-1 selection" data-employee-role="' + value.employeeRole + '">' + value.employeeRole + "</td>" +
+            "<td class='col-sm-1 action-icon'>" +
             "<span class='glyphicon glyphicon-pencil icon-margin cursor-point text-success' id='icon-update-user'></span>" +
             "<span class='glyphicon glyphicon-trash cursor-point text-warning' id='icon-delete-user'></span>" +
             "</td>" +
             "</tr>"
         )
     });
+
 }
 
+$("#btn-register").click(function (e) {
+    e.preventDefault();
+    console.log($("#register-staff-form").serialize());
+
+    if(true){
+        insertData();
+    }
+});
+
+$("#staff-data").on("click", "#icon-update-user", function () {
+
+    var tr = $(this).parent().parent();
+
+    var attribute = { id : "", value : "", class : "form-control", disabled : false };
+
+    tr.find("td").each(function () {
+        var input = $('<input type="text">');
+
+        $.each($(this).data(), function (key, value) {
+            attribute.id = key;
+            attribute.value = value;
+        });
+
+       if($(this).hasClass('editable')){
+            attribute.disabled = false;
+            input.attr(attribute);
+            $(this).html(input);
+       }
+       else if($(this).hasClass('not-editable')){
+            attribute.disabled = true;
+            input.attr(attribute);
+            $(this).html(input);
+       }
+       else if($(this).hasClass('selection')){
+
+            if(attribute.id === "employeeRole"){
+                $(this).html(
+                    '<select id="' + attribute.id + '" class="form-control" data-selected="' + attribute.value + '">' +
+                    '<option>Admin</option>' +
+                    '<option>Cashier</option>' +
+                    '</select>'
+                );
+            }else if(attribute.id === "employeeGender"){
+                $(this).html(
+                    '<select id="' + attribute.id + '" class="form-control" data-selected="' + attribute.value + '">' +
+                    '<option>Male</option>' +
+                    '<option>Female</option>' +
+                    '</select>'
+                );
+            }
+
+       }
+    });
+
+    $(this).removeClass("glyphicon-pencil").addClass("glyphicon-ok").attr("id", "update-data");
+    $(this).siblings().removeClass("glyphicon-trash").addClass("glyphicon-remove").attr("id", "cancel-update");
+});
+
+$("#staff-data").on("click", "#update-data", function () {
+   formToJSON($(this).parent().parent());
+});
+
+$("#staff-data").on("click", "#cancel-update", function () {
+    var tr = $(this).parent().parent();
+
+    tr.find(":input").each(function () {
+        if($(this).parent().hasClass("selection")){
+            var data = $(this).data("selected");
+            $(this).parent().html(data);
+        }else {
+            $(this).parent().html($(this).prop("defaultValue"));
+        }
+    });
+
+
+    $(this).siblings().removeClass("glyphicon-ok").addClass("glyphicon-pencil").attr("id", "icon-update-user");
+    $(this).removeClass("glyphicon-remove").addClass("glyphicon-trash").attr("id", "icon-delete-user");
+});
 
 $("#staff-data").on("click", "#icon-delete-user" ,function () {
 
     var tr = $(this).parent().parent();
 
-    var staffId = tr.find("td:first").html();
+    var staffId = tr.find("td:first").text();
 
-    $.ajax({
-        url : "/user/delete?" + staffId,
-        type : "DELETE",
-        success : retrieveData,
-        error : function () {
-            alert("error");
-        }
-    })
+    deleteData(staffId);
+});
+
+$("#search-item").keyup(function () {
+   var searchValue = $(this).val();
+
+   if(searchValue == ''){
+       retrieveData();
+   }else{
+       searchData(searchValue);
+   }
+
 });

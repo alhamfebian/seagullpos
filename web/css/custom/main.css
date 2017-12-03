@@ -13,6 +13,8 @@ ul, li{
     min-width: 220px;
     background-color: #23262d;
     display: inline-block;
+    position: fixed;
+    top: 50px;
 }
 
 .side-nav .side-nav-menu ul{
