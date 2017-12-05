@@ -67,7 +67,8 @@ public class EmployeeDAO {
         return  listUser;
     }
 
-    public List<EmployeeModel> getPaginateUserList(int limit, int offset){
+    public List<EmployeeModel> getPaginateUserList(int offset){
+        int limit = 10;
         List<EmployeeModel> listUser = null;
         try {
             connection = ConnectionManager.createConnection();
@@ -89,6 +90,38 @@ public class EmployeeDAO {
             }
         }
         return listUser;
+    }
+
+    public int getTotalUser(String search){
+        String query = "SELECT COUNT(*) FROM employee WHERE " +
+                " LOWER(employeeid) LIKE " +
+                " LOWER(?)" +
+                "  OR " +
+                " LOWER(employeename) LIKE " +
+                " LOWER(?)";
+        int total = 0;
+        try{
+            connection = ConnectionManager.createConnection();
+            ps = connection.prepareStatement(query);
+
+            ps.setString(1, "%" + search + "%");
+            ps.setString(2, "%" + search + "%");
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()) {
+                total = rs.getInt(1);
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) try{
+                ps.close();
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
+        }
+
+        return total;
     }
 
     public String getLastID(String role){

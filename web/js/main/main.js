@@ -62,7 +62,7 @@ $("#btn-login").click(function (e) {
 });
 
 
-retrieveData();
+retrieveDataPaging(1);
 
 function retrieveData(){
     $.ajax({
@@ -76,12 +76,43 @@ function retrieveData(){
     })
 }
 
+function retrieveDataPaging(pageNumber){
+    $.ajax({
+        url : "/user/" + "userdata?page=" + pageNumber,
+        dataType : "JSON",
+        type : "GET",
+        success : function (data) {
+            processUserData(data);
+            setTimeout(getTotalData(pageNumber, ""), 1000);
+        },
+        error : function () {
+            alert("error");
+        }
+    })
+}
+
+function getTotalData(pageNumber, search){
+    $.ajax({
+        url : "/user/totaldata?query=" + search,
+        dataType : "JSON",
+        type : "GET",
+        success : function (data) {
+            createPaginate(data, pageNumber);
+        },
+        error : function () {
+            alert("error");
+        }
+    })
+}
+
 function insertData(){
     $.ajax({
         url : "/user",
         type : "POST",
         data : $("#register-staff-form").serialize(),
-        success : retrieveData,
+        success : function () {
+            retrieveDataPaging(1);
+        },
         error : function () {
             alert("waduh");
         }
@@ -94,7 +125,10 @@ function searchData(searchValue) {
         url : "/user/search?query=" + searchValue,
         dataType : "JSON",
         type : "GET",
-        success : processUserData,
+        success : function (data) {
+            processUserData(data);
+            getTotalData(1, searchValue);
+        },
         error : function () {
             alert("error");
         }
@@ -109,7 +143,9 @@ function updateData(data){
         type : "PUT",
         contentType : "application/json",
         data : JSON.stringify(data),
-        success : retrieveData,
+        success : function () {
+            retrieveDataPaging(1);
+        },
         error : function (ts) {
             alert(ts.responseText);
         }
@@ -120,7 +156,9 @@ function deleteData(staffId){
     $.ajax({
         url : "/user/delete?id=" + staffId,
         type : "DELETE",
-        success : retrieveData,
+        success : function () {
+            retrieveDataPaging(1);
+        },
         error : function () {
             alert("error");
         }
@@ -136,6 +174,27 @@ function formToJSON(tr){
 
     updateData(obj);
 }
+
+function createPaginate(data, pageNumber) {
+    var total = data;
+    var paginate = $('.pagination');
+
+    var numberOfLinks = Math.ceil(total / 10);
+    console.log(numberOfLinks);
+    var prev = (pageNumber == 1) ? 1 : (pageNumber - 1);
+    var next = (pageNumber == numberOfLinks) ? numberOfLinks : (pageNumber + 1);
+
+    paginate.empty();
+    paginate.append('<li><a href="#" data-page="' + prev + '"><span aria-hidden="true">&laquo;</span></a></li>');
+    for(var i = 0; i < numberOfLinks; i++){
+        paginate.append('<li><a href="#" data-page="' + (i + 1) + '">' +
+            (i + 1) + '</a></li>');
+    }
+    paginate.append('<li><a href="#" data-page="' + next + '"><span>&raquo;</span></a></li>');
+    paginate.find('li').eq(pageNumber).addClass('active');
+}
+
+
 
 function processUserData(data) {
     var listUser = data == null ? [] : data;
@@ -163,6 +222,13 @@ function processUserData(data) {
     });
 
 }
+
+$('.pagination').on("click", "a", function () {
+    var pageNumber = $(this).data('page');
+    $(this).parent().siblings('li').removeClass('active');
+    $(this).parent().addClass('active');
+    retrieveDataPaging(pageNumber);
+});
 
 $("#btn-register").click(function (e) {
     e.preventDefault();
@@ -256,7 +322,7 @@ $("#search-item").keyup(function () {
    var searchValue = $(this).val();
 
    if(searchValue == ''){
-       retrieveData();
+       retrieveDataPaging(1);
    }else{
        searchData(searchValue);
    }
