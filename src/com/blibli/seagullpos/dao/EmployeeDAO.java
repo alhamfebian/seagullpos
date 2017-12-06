@@ -100,6 +100,7 @@ public class EmployeeDAO {
                 " LOWER(employeename) LIKE " +
                 " LOWER(?)";
         int total = 0;
+        System.out.println(total);
         try{
             connection = ConnectionManager.createConnection();
             ps = connection.prepareStatement(query);
@@ -107,9 +108,11 @@ public class EmployeeDAO {
             ps.setString(1, "%" + search + "%");
             ps.setString(2, "%" + search + "%");
             ResultSet rs = ps.executeQuery();
+
             if(rs.next()) {
                 total = rs.getInt(1);
             }
+
         }catch (SQLException e){
             e.printStackTrace();
         }finally {
@@ -270,14 +273,16 @@ public class EmployeeDAO {
         return deleteStatus;
     }
 
-    public List<EmployeeModel> liveSearch(String userQuery){
+    public List<EmployeeModel> liveSearch(String userQuery, int offset){
+        int limit = 10;
         String query = "SELECT * FROM employee WHERE " +
                 "LOWER(employeeid) LIKE " +
                 "LOWER(?)" +
                 " OR " +
                 "LOWER(employeename) LIKE " +
                 "LOWER(?)" +
-                "ORDER BY employeeid ASC ";
+                "ORDER BY employeeid ASC " +
+                "LIMIT ? OFFSET ? ";
         List<EmployeeModel> searchUsers = null;
 
         try{
@@ -285,7 +290,8 @@ public class EmployeeDAO {
             ps = connection.prepareStatement(query);
             ps.setString(1, "%" + userQuery + "%");
             ps.setString(2, "%" + userQuery + "%");
-
+            ps.setInt(3, limit);
+            ps.setInt(4, offset);
             ResultSet rs = ps.executeQuery();
 
             searchUsers = processAllROw(rs);

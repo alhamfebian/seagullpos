@@ -53,7 +53,7 @@
                         </div>
                     </div>
 
-                    <span>Total User : </span>
+                    <span id="total-user">Total User : </span>
 
                     <table class="table table-bordered" id="staff-data">
                         <thead>

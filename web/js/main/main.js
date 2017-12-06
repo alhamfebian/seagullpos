@@ -51,9 +51,6 @@ function validateLoginForm() {
     return check;
 }
 
-
-
-
 $("#btn-login").click(function (e) {
     e.preventDefault();
     if(validateLoginForm()){
@@ -97,7 +94,8 @@ function getTotalData(pageNumber, search){
         dataType : "JSON",
         type : "GET",
         success : function (data) {
-            createPaginate(data, pageNumber);
+            $('#total-user').html('Total User : ' + data + " user(s)");
+            createPaginate(data, pageNumber, search);
         },
         error : function () {
             alert("error");
@@ -119,15 +117,15 @@ function insertData(){
     })
 }
 
-function searchData(searchValue) {
+function searchData(searchValue, pageNumber) {
     console.log(searchValue);
     $.ajax({
-        url : "/user/search?query=" + searchValue,
+        url : "/user/search?query=" + searchValue + "&page=" + pageNumber,
         dataType : "JSON",
         type : "GET",
         success : function (data) {
             processUserData(data);
-            getTotalData(1, searchValue);
+            getTotalData(pageNumber, searchValue);
         },
         error : function () {
             alert("error");
@@ -175,26 +173,27 @@ function formToJSON(tr){
     updateData(obj);
 }
 
-function createPaginate(data, pageNumber) {
+function createPaginate(data, pageNumber, search) {
     var total = data;
     var paginate = $('.pagination');
-
     var numberOfLinks = Math.ceil(total / 10);
-    console.log(numberOfLinks);
     var prev = (pageNumber == 1) ? 1 : (pageNumber - 1);
     var next = (pageNumber == numberOfLinks) ? numberOfLinks : (pageNumber + 1);
 
     paginate.empty();
+
+    paginate.data("search", search);
+
     paginate.append('<li><a href="#" data-page="' + prev + '"><span aria-hidden="true">&laquo;</span></a></li>');
+
     for(var i = 0; i < numberOfLinks; i++){
         paginate.append('<li><a href="#" data-page="' + (i + 1) + '">' +
             (i + 1) + '</a></li>');
     }
+
     paginate.append('<li><a href="#" data-page="' + next + '"><span>&raquo;</span></a></li>');
     paginate.find('li').eq(pageNumber).addClass('active');
 }
-
-
 
 function processUserData(data) {
     var listUser = data == null ? [] : data;
@@ -225,9 +224,15 @@ function processUserData(data) {
 
 $('.pagination').on("click", "a", function () {
     var pageNumber = $(this).data('page');
+    var search = $(this).parent().parent().data("search");
     $(this).parent().siblings('li').removeClass('active');
-    $(this).parent().addClass('active');
-    retrieveDataPaging(pageNumber);
+    //$(this).parent().addClass('active');
+    console.log(search);
+
+    if(search == '')
+        retrieveDataPaging(pageNumber);
+    else
+        searchData(search, pageNumber);
 });
 
 $("#btn-register").click(function (e) {
@@ -324,7 +329,7 @@ $("#search-item").keyup(function () {
    if(searchValue == ''){
        retrieveDataPaging(1);
    }else{
-       searchData(searchValue);
+       searchData(searchValue, 1);
    }
 
 });

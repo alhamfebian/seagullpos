@@ -67,20 +67,22 @@ public class UserService extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         dao = new EmployeeDAO();
         List<EmployeeModel> listUser = null;
+
         String searchData = request.getParameter("query");
         if(request.getPathInfo().equals("/totaldata")){
+
             int total = dao.getTotalUser(searchData);
 
             String totalJSON = new Gson().toJson(total);
             response.getWriter().write(totalJSON);
         }else{
+            int page = Integer.parseInt(request.getParameter("page"));
+            int offset = (page - 1) * 10;
             if(request.getPathInfo().equals("/userdata")){
-                int page = Integer.parseInt(request.getParameter("page"));
-                int offset = (page - 1) * 10;
                 listUser = dao.getPaginateUserList(offset);
             }
             else if(request.getPathInfo().equals("/search")){
-                listUser = dao.liveSearch(searchData);
+                listUser = dao.liveSearch(searchData, offset);
             }
 
             String listUserJSON = new Gson().toJson(listUser);
