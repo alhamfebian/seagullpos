@@ -3,18 +3,21 @@ package com.blibli.seagullpos.model;
 import java.util.Date;
 
 public class MemberModel {
-    private String memberID;
+    private long memberId;
     private String memberName;
     private int memberPoint;
+    private String memberEmail;
     private String phoneNumber;
     private Date registerDate;
+    private int totalTransaction;
+    private SummaryList<HeaderTransactionModel> listMemberTransaction;
 
-    public String getMemberID() {
-        return memberID;
+    public long getMemberID() {
+        return memberId;
     }
 
-    public void setMemberID(String memberID) {
-        this.memberID = memberID;
+    public void setMemberID(long memberId) {
+        this.memberId = memberId;
     }
 
     public String getMemberName() {
@@ -33,6 +36,14 @@ public class MemberModel {
         this.memberPoint = memberPoint;
     }
 
+    public String getMemberEmail() {
+        return memberEmail;
+    }
+
+    public void setMemberEmail(String memberEmail) {
+        this.memberEmail = memberEmail;
+    }
+
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -47,5 +58,21 @@ public class MemberModel {
 
     public void setRegisterDate(Date registerDate) {
         this.registerDate = registerDate;
+    }
+
+    public SummaryList<HeaderTransactionModel> getListMemberTransaction() {
+        return listMemberTransaction;
+    }
+
+    public void setListMemberTransaction(SummaryList<HeaderTransactionModel> listMemberTransaction) {
+        this.listMemberTransaction = listMemberTransaction;
+    }
+
+    public int getTotalTransaction() {
+        return totalTransaction;
+    }
+
+    public void setTotalTransaction(int totalTransaction) {
+        this.totalTransaction = totalTransaction;
     }
 }

@@ -58,29 +58,28 @@ $("#btn-login").click(function (e) {
     }
 });
 
+var url = "";
 
-retrieveDataPaging(1);
-
-function retrieveData(){
-    $.ajax({
-        url : "/user",
-        dataType : "JSON",
-        type : "GET",
-        success : processUserData,
-        error : function () {
-            alert("error");
-        }
-    })
+function setPath(apiURL) {
+    url = apiURL;
 }
 
-function retrieveDataPaging(pageNumber){
+function retrieveDataPaging(pagingURL){
     $.ajax({
-        url : "/user/" + "userdata?page=" + pageNumber,
+        url : pagingURL,
         dataType : "JSON",
         type : "GET",
         success : function (data) {
-            processUserData(data);
-            setTimeout(getTotalData(pageNumber, ""), 1000);
+            if(url == "/user"){
+                processUserData(data.content);
+                $('#total-user').html('Total User : ' + data.totalRecords + " user(s)");
+            }
+            else if(url == "/member"){
+                processMemberData(data.content);
+                $('#total-member').html('Total Member : ' + data.totalRecords + " member(s)");
+            }
+
+            paginateLink(data.totalRecords, data.pageSize, data.currentPage);
         },
         error : function () {
             alert("error");
@@ -88,28 +87,13 @@ function retrieveDataPaging(pageNumber){
     })
 }
 
-function getTotalData(pageNumber, search){
+function insertData(data){
     $.ajax({
-        url : "/user/totaldata?query=" + search,
-        dataType : "JSON",
-        type : "GET",
-        success : function (data) {
-            $('#total-user').html('Total User : ' + data + " user(s)");
-            createPaginate(data, pageNumber, search);
-        },
-        error : function () {
-            alert("error");
-        }
-    })
-}
-
-function insertData(){
-    $.ajax({
-        url : "/user",
+        url : url,
         type : "POST",
-        data : $("#register-staff-form").serialize(),
+        data : data,
         success : function () {
-            retrieveDataPaging(1);
+            retrieveDataPaging(url);
         },
         error : function () {
             alert("waduh");
@@ -117,15 +101,21 @@ function insertData(){
     })
 }
 
-function searchData(searchValue, pageNumber) {
-    console.log(searchValue);
+function searchData(pageURL) {
+    console.log(pageURL);
     $.ajax({
-        url : "/user/search?query=" + searchValue + "&page=" + pageNumber,
+        url : pageURL,
         dataType : "JSON",
         type : "GET",
         success : function (data) {
-            processUserData(data);
-            getTotalData(pageNumber, searchValue);
+            if(url == "/user"){
+                processUserData(data.content);
+                $('#total-user').html('Total User : ' + data.totalRecords + " user(s)");
+            }else if(url == "/member"){
+                processMemberData(data.content);
+                $('#total-member').html('Total Member : ' + data.totalRecords + " member(s)");
+            }
+            paginateLink(data.totalRecords, data.pageSize, data.currentPage, pageURL);
         },
         error : function () {
             alert("error");
@@ -137,12 +127,12 @@ function updateData(data){
     console.log(data);
 
     $.ajax({
-        url : "/user/update?id=" + data.employeeid,
+        url : url + "/update?id=" + data.employeeId,
         type : "PUT",
         contentType : "application/json",
         data : JSON.stringify(data),
         success : function () {
-            retrieveDataPaging(1);
+            retrieveDataPaging(url);
         },
         error : function (ts) {
             alert(ts.responseText);
@@ -150,12 +140,29 @@ function updateData(data){
     })
 }
 
-function deleteData(staffId){
+function changePassword(employeeId, newPassword){
     $.ajax({
-        url : "/user/delete?id=" + staffId,
+        url : url + "/update/changepassword?id=" + employeeId,
+        type : "PUT",
+        contentType : "application/json",
+        data : JSON.stringify({ employeeId : employeeId, employeePassword : newPassword }),
+        success : function () {
+            alert("success");
+            $('#changePassword').modal('hide');
+            retrieveDataPaging(url);
+        },
+        error : function () {
+            alert("haha");
+        }
+    })
+}
+
+function deleteData(id){
+    $.ajax({
+        url : url + "/delete?id=" + id,
         type : "DELETE",
         success : function () {
-            retrieveDataPaging(1);
+            retrieveDataPaging(url);
         },
         error : function () {
             alert("error");
@@ -169,30 +176,8 @@ function formToJSON(tr){
         if($(this).val() == 'undefined') obj[$(this).attr('id')] = null;
         else obj[$(this).attr('id')] = $(this).val();
     });
-
+    obj.lastLogin = obj.lastLogin == "Haven't login yet" ? null : obj.lastLogin;
     updateData(obj);
-}
-
-function createPaginate(data, pageNumber, search) {
-    var total = data;
-    var paginate = $('.pagination');
-    var numberOfLinks = Math.ceil(total / 10);
-    var prev = (pageNumber == 1) ? 1 : (pageNumber - 1);
-    var next = (pageNumber == numberOfLinks) ? numberOfLinks : (pageNumber + 1);
-
-    paginate.empty();
-
-    paginate.data("search", search);
-
-    paginate.append('<li><a href="#" data-page="' + prev + '"><span aria-hidden="true">&laquo;</span></a></li>');
-
-    for(var i = 0; i < numberOfLinks; i++){
-        paginate.append('<li><a href="#" data-page="' + (i + 1) + '">' +
-            (i + 1) + '</a></li>');
-    }
-
-    paginate.append('<li><a href="#" data-page="' + next + '"><span>&raquo;</span></a></li>');
-    paginate.find('li').eq(pageNumber).addClass('active');
 }
 
 function processUserData(data) {
@@ -202,57 +187,140 @@ function processUserData(data) {
 
     var tableData = $("#staff-data tbody");
 
-    console.log(listUser);
     $.each(listUser, function (key, value) {
+        value.lastLogin = (value.lastLogin === null) ? 'Haven\'t login yet': value.lastLogin;
         tableData.append(
             "<tr>" +
             '<td class="col-sm-1 not-editable" data-employee-id="' + value.employeeId + '">' + value.employeeId + "</td>" +
             '<td class="col-sm-2 editable" data-employee-name="' + value.employeeName + '">' + value.employeeName + "</td>" +
-            '<td class="col-sm-3 editable" data-employee-email="' + value.employeeEmail + '">' + value.employeeEmail + "</td>" +
+            '<td class="col-sm-2 editable" data-employee-email="' + value.employeeEmail + '">' + value.employeeEmail + "</td>" +
             '<td class="col-sm-1 selection" data-employee-gender="' + value.employeeGender + '">' + value.employeeGender + "</td>" +
             '<td class="col-sm-3 not-editable" data-last-login="' + value.lastLogin + '">' + value.lastLogin + "</td>" +
             '<td class="col-sm-1 selection" data-employee-role="' + value.employeeRole + '">' + value.employeeRole + "</td>" +
-            "<td class='col-sm-1 action-icon'>" +
-            "<span class='glyphicon glyphicon-pencil icon-margin cursor-point text-success' id='icon-update-user'></span>" +
-            "<span class='glyphicon glyphicon-trash cursor-point text-warning' id='icon-delete-user'></span>" +
+            "<td class='col-sm-2 action-icon'>" +
+            "<span class='glyphicon glyphicon-pencil icon-margin cursor-point text-success icon-update'></span>" +
+            "<span class='glyphicon glyphicon-trash cursor-point text-warning icon-margin icon-delete'></span>" +
+            "<span class='glyphicon glyphicon-lock cursor-point text-danger' id='icon-password-user' data-toggle='modal' " +
+            "data-target='#changePassword'></span>" +
             "</td>" +
             "</tr>"
         )
     });
-
 }
 
-$('.pagination').on("click", "a", function () {
-    var pageNumber = $(this).data('page');
-    var search = $(this).parent().parent().data("search");
-    $(this).parent().siblings('li').removeClass('active');
-    //$(this).parent().addClass('active');
-    console.log(search);
+function processMemberData(data) {
+    var listMember = data == null ? [] : data;
 
-    if(search == '')
-        retrieveDataPaging(pageNumber);
+    $("#member-data tbody tr").remove();
+
+    var tableData = $("#member-data tbody");
+
+    $.each(listMember, function (key, value) {
+        tableData.append(
+            "<tr>" +
+            "<td class='col-sm-1 not-editable' data-member-id='" + value.memberId +"'>" + value.memberId +"</td>" +
+            "<td class='col-sm-2 editable' data-member-name='" + value.memberName + "'>" + value.memberName + "</td>" +
+            "<td class='col-sm-2 editable' data-member-email='" + value.memberEmail + "'>" + value.memberEmail + "</td>" +
+            "<td class='col-sm-1 editable' data-phone-number='" + value.phoneNumber + "'>" + value.phoneNumber + "</td>" +
+            "<td class='col-sm-1 not-editable' data-total-transaction='" + value.totalTransaction + "'>" + value.totalTransaction + "</td>" +
+            "<td class='col-sm-1 not-editable' data-member-point='" + value.memberPoint + "'>" + value.memberPoint + "</td>" +
+            "<td class='col-sm-2 not-editable' data-register-date='" + value.registerDate + "'>" + value.registerDate + "</td>" +
+            "<td class='col-sm-1 action-icon'>" +
+            "<span class='glyphicon glyphicon-pencil icon-margin cursor-point text-success icon-update'></span>" +
+            "<span class='glyphicon glyphicon-trash cursor-point text-warning icon-margin icon-delete'></span>" +
+            "</td>" +
+            "</tr>"
+        )
+    })
+}
+
+function paginateLink(total ,limit, currentPage, currentURL) {
+    var numberOfLinks = Math.ceil(total / limit);
+    var paginate = $('.pagination');
+    var prev = (currentPage == 1) ? 1 : (currentPage - 1);
+    var next = (currentPage == numberOfLinks) ? numberOfLinks : (currentPage + 1);
+    var pageURL = setPagingLink(currentURL);
+
+    console.log(total + " " + pageURL);
+
+    paginate.empty();
+    for(var i = 1; i <= numberOfLinks; i++){
+        paginate.append('<li><a href="' + pageURL + i + ' ">' +
+            i + '</a></li>');
+    }
+    paginate.prepend('<li><a href="' + pageURL + prev + '"><span aria-hidden="true">&laquo;</span></a></li>');
+    paginate.append('<li><a href="' + pageURL + next +' "><span>&raquo;</span></a></li>');
+    paginate.find('li').eq(currentPage).addClass('active');
+}
+
+function setPagingLink(currentURL){
+    var pageURL = url;
+
+    if(currentURL != null){
+        var index = currentURL.search("&page");
+        if(index == -1)
+            pageURL = currentURL + "&page=";
+        else{
+            pageURL = currentURL.substr(0, index) + "&page=";
+        }
+    }
+    else{
+        pageURL = pageURL + "?page=";
+    }
+
+    return pageURL;
+}
+
+$('.pagination').on("click", "a", function (e) {
+    e.preventDefault();
+    var url = $(this).attr('href');
+    $(this).parent().siblings('li').removeClass('active');
+    console.log(url);
+    if(url.indexOf('&') == -1)
+        retrieveDataPaging(url);
     else
-        searchData(search, pageNumber);
+        searchData(url);
+});
+
+$(".search-item").keyup(function () {
+    var searchValue = $(this).val();
+
+    if(searchValue == ''){
+        retrieveDataPaging(url);
+    }else{
+        var searchURL = url + "/search?query=" + searchValue;
+        searchData(searchURL);
+    }
+
 });
 
 $("#btn-register").click(function (e) {
     e.preventDefault();
-    console.log($("#register-staff-form").serialize());
-
+    var form = $('.modal-body').find('form');
+    var data = form.serialize();
     if(true){
-        insertData();
+        insertData(data);
     }
 });
 
-$("#staff-data").on("click", "#icon-update-user", function () {
+$("#btn-change-password").click(function (e) {
+    e.preventDefault();
 
+    var employeeId = $('#employeeId').val();
+    var employeePassword = $('#employeePassword').val();
+
+    if(true){
+        changePassword(employeeId, employeePassword);
+    }
+});
+
+$(".list-table-data").on("click", ".icon-update", function () {
     var tr = $(this).parent().parent();
 
     var attribute = { id : "", value : "", class : "form-control", disabled : false };
 
     tr.find("td").each(function () {
         var input = $('<input type="text">');
-
         $.each($(this).data(), function (key, value) {
             attribute.id = key;
             attribute.value = value;
@@ -289,15 +357,15 @@ $("#staff-data").on("click", "#icon-update-user", function () {
        }
     });
 
-    $(this).removeClass("glyphicon-pencil").addClass("glyphicon-ok").attr("id", "update-data");
-    $(this).siblings().removeClass("glyphicon-trash").addClass("glyphicon-remove").attr("id", "cancel-update");
+    $(this).removeClass("glyphicon-pencil icon-update").addClass("glyphicon-ok").attr("id", "update-data");
+    $(this).siblings().removeClass("glyphicon-trash icon-delete").addClass("glyphicon-remove").attr("id", "cancel-update");
 });
 
-$("#staff-data").on("click", "#update-data", function () {
+$(".list-table-data").on("click", "#update-data", function () {
    formToJSON($(this).parent().parent());
 });
 
-$("#staff-data").on("click", "#cancel-update", function () {
+$(".list-table-data").on("click", "#cancel-update", function () {
     var tr = $(this).parent().parent();
 
     tr.find(":input").each(function () {
@@ -310,26 +378,25 @@ $("#staff-data").on("click", "#cancel-update", function () {
     });
 
 
-    $(this).siblings().removeClass("glyphicon-ok").addClass("glyphicon-pencil").attr("id", "icon-update-user");
-    $(this).removeClass("glyphicon-remove").addClass("glyphicon-trash").attr("id", "icon-delete-user");
+    $(this).siblings().removeClass("glyphicon-ok").addClass("glyphicon-pencil icon-update");
+    $(this).removeClass("glyphicon-remove").addClass("glyphicon-trash icon-delete");
 });
 
-$("#staff-data").on("click", "#icon-delete-user" ,function () {
+$(".list-table-data").on("click", ".icon-delete" ,function () {
 
     var tr = $(this).parent().parent();
 
-    var staffId = tr.find("td:first").text();
-
-    deleteData(staffId);
+    var id = tr.find("td:first").text();
+    console.log(id);
+    deleteData(id);
 });
 
-$("#search-item").keyup(function () {
-   var searchValue = $(this).val();
+$("#staff-data").on("click", "#icon-password-user", function () {
+    var tr = $(this).parent().parent();
 
-   if(searchValue == ''){
-       retrieveDataPaging(1);
-   }else{
-       searchData(searchValue, 1);
-   }
+    var staffId = tr.find("td:first").text();
+    var staffName = tr.find("td").eq(1).text();
 
+    $('#employeeId').val(staffId);
+    $('#employeeName').val(staffName);
 });

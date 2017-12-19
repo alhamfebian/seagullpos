@@ -1,7 +1,7 @@
 package com.blibli.seagullpos.dao;
 
 import com.blibli.seagullpos.connection.ConnectionManager;
-import com.blibli.seagullpos.model.CategoryModel;
+import com.blibli.seagullpos.model.ProductCategoryModel;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,9 +22,9 @@ public class CategoryDAO {
         }
     }
 
-    public List<CategoryModel> getAllCategory(){
+    public List<ProductCategoryModel> getAllCategory(){
         String query = "SELECT * FROM productcategory";
-        List<CategoryModel> listCategory = null;
+        List<ProductCategoryModel> listCategory = null;
         try {
             ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
@@ -37,10 +37,10 @@ public class CategoryDAO {
         return listCategory;
     }
 
-    public List<CategoryModel> processAllRow(ResultSet rs) throws SQLException{
-        List<CategoryModel> listCategory = new ArrayList<>();
+    public List<ProductCategoryModel> processAllRow(ResultSet rs) throws SQLException{
+        List<ProductCategoryModel> listCategory = new ArrayList<>();
         while(rs.next()){
-            CategoryModel category = new CategoryModel();
+            ProductCategoryModel category = new ProductCategoryModel();
             category.setCategoryID(rs.getInt("productcategoryid"));
             category.setCategoryName(rs.getString("productcategoryname"));
             listCategory.add(category);

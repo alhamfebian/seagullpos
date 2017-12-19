@@ -2,6 +2,7 @@ package com.blibli.seagullpos.dao;
 
 import com.blibli.seagullpos.connection.ConnectionManager;
 import com.blibli.seagullpos.model.EmployeeModel;
+import com.blibli.seagullpos.model.SummaryList;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,9 +13,8 @@ public class EmployeeDAO {
     private Connection connection = null;
     private PreparedStatement ps = null;
 
-    public EmployeeDAO(){
-
-    }
+    private SummaryList<EmployeeModel> employeeSummaryList;
+    private List<EmployeeModel> listUser = null;
 
     public EmployeeModel authenticateUser(String email, String password){
 
@@ -44,32 +44,9 @@ public class EmployeeDAO {
         return employeeModel;
     }
 
-    public List<EmployeeModel> getAllUser(){
-        List<EmployeeModel> listUser = null;
+    public List<EmployeeModel> getPaginateUserList(int offset, int limit){
 
-        try{
-            connection = ConnectionManager.createConnection();
-            String query = "SELECT * FROM employee ORDER BY employeeid ASC";
-            ps = connection.prepareStatement(query);
-
-            ResultSet rs = ps.executeQuery();
-            listUser = processAllROw(rs);
-        }catch (SQLException e){
-            e.printStackTrace();
-        }finally {
-            if(connection != null) ConnectionManager.closeConnection(connection);
-            if(ps != null) try {
-                ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return  listUser;
-    }
-
-    public List<EmployeeModel> getPaginateUserList(int offset){
-        int limit = 10;
-        List<EmployeeModel> listUser = null;
+        employeeSummaryList = new SummaryList<>();
         try {
             connection = ConnectionManager.createConnection();
             String query = "SELECT * FROM employee ORDER BY employeeid ASC LIMIT ? OFFSET ?";
@@ -78,7 +55,6 @@ public class EmployeeDAO {
             ps.setInt(2, offset);
             ResultSet rs = ps.executeQuery();
             listUser = processAllROw(rs);
-
         }catch (SQLException e){
             e.printStackTrace();
         }finally {
@@ -92,7 +68,33 @@ public class EmployeeDAO {
         return listUser;
     }
 
-    public int getTotalUser(String search){
+    public int getTotalUser(){
+        String query = "SELECT COUNT(*) FROM employee";
+        int total = 0;
+        try{
+            connection = ConnectionManager.createConnection();
+            ps = connection.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()){
+                total = rs.getInt(1);
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null){
+                try{
+                    ps.close();
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+        return total;
+    }
+
+    public int getTotalSearchUser(String search){
         String query = "SELECT COUNT(*) FROM employee WHERE " +
                 " LOWER(employeeid) LIKE " +
                 " LOWER(?)" +
@@ -205,7 +207,7 @@ public class EmployeeDAO {
             ps.setString(5, employee.getEmployeeRole().toLowerCase());
             ps.setString(6, currentId);
             updateStatus = ps.execute();
-
+            System.out.println("test");
         }catch (SQLException e){
             e.printStackTrace();
         }finally {
@@ -214,6 +216,37 @@ public class EmployeeDAO {
                 ps.close();
             } catch (SQLException e) {
                 e.printStackTrace();
+            }
+        }
+        return updateStatus;
+    }
+
+    public boolean changePassword(String employeeId, String password){
+        String query = "UPDATE employee " +
+                "SET " +
+                "password = md5(?) " +
+                "WHERE employeeId = ?";
+
+        boolean updateStatus = false;
+
+        try{
+            connection = ConnectionManager.createConnection();
+            ps = connection.prepareStatement(query);
+
+            ps.setString(1, password);
+            ps.setString(2, employeeId);
+            updateStatus = ps.execute();
+
+        }catch (SQLException e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null){
+                try {
+                    ps.close();
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
             }
         }
         return updateStatus;
@@ -275,6 +308,7 @@ public class EmployeeDAO {
 
     public List<EmployeeModel> liveSearch(String userQuery, int offset){
         int limit = 10;
+
         String query = "SELECT * FROM employee WHERE " +
                 "LOWER(employeeid) LIKE " +
                 "LOWER(?)" +
@@ -301,7 +335,6 @@ public class EmployeeDAO {
         }
         return searchUsers;
     }
-
 
     public List<EmployeeModel> processAllROw(ResultSet rs) throws SQLException{
         List<EmployeeModel> listEmployee = new ArrayList<>();
@@ -340,4 +373,29 @@ public class EmployeeDAO {
         return employeeModel;
     }
 
+    public SummaryList<EmployeeModel> getEmployeeSummaryList(int currentPage){
+        int limit = 10;
+        int offset = (currentPage - 1) * 10;
+        List<EmployeeModel> employees = getPaginateUserList(offset, limit);
+        int totalData = getTotalUser();
+        setData(employees, currentPage, limit, totalData);
+        return employeeSummaryList;
+    }
+
+    public SummaryList<EmployeeModel> searchEmployeeSummaryList(String query, int currentPage) {
+        int limit = 10;
+        int offset = (currentPage - 1) * 10;
+        List<EmployeeModel> employees = liveSearch(query, offset);
+        int totalData = getTotalSearchUser(query);
+        setData(employees, currentPage, limit, totalData);
+        return employeeSummaryList;
+    }
+
+    public void setData(List<EmployeeModel> employees, int currentPage, int limit, int totalData) {
+        employeeSummaryList = new SummaryList<>();
+        employeeSummaryList.setContent(employees);
+        employeeSummaryList.setCurrentPage(currentPage);
+        employeeSummaryList.setPageSize(limit);
+        employeeSummaryList.setTotalRecords(totalData);
+    }
 }

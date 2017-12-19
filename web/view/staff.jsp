@@ -44,7 +44,7 @@
                                         <li><a href="#">Role</a></li>
                                     </ul>
                                 </div>
-                                <input type="text" class="form-control" id="search-item" name="search-item" placeholder="Search...">
+                                <input type="text" class="form-control search-item" name="search-item" placeholder="Search...">
                                 <span class="input-group-addon">
                                         <span class="glyphicon glyphicon-search"></span>
                                 </span>
@@ -55,16 +55,16 @@
 
                     <span id="total-user">Total User : </span>
 
-                    <table class="table table-bordered" id="staff-data">
+                    <table class="table table-striped table-responsive list-table-data" id="staff-data">
                         <thead>
                             <tr>
-                                <td>Id</td>
-                                <td>Name</td>
-                                <td>Email</td>
-                                <td>Gender</td>
-                                <td>Last Login</td>
-                                <td>Role</td>
-                                <td>Action</td>
+                                <td class="col-sm-1">Id</td>
+                                <td class="col-sm-2">Name</td>
+                                <td class="col-sm-2">Email</td>
+                                <td class="col-sm-1">Gender</td>
+                                <td class="col-sm-3">Last Login</td>
+                                <td class="col-sm-1">Role</td>
+                                <td class="col-sm-2">Action</td>
                             </tr>
                         </thead>
 
@@ -145,6 +145,59 @@
         </div>
     </div>
 
+    <div class="modal fade" id="changePassword">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="changePasswordLabel">Change Password</h4>
+                </div>
+
+                <div class="modal-body">
+                    <form id="change-password">
+                        <div class="form-group">
+                            <label for="employeeId">Employee Id</label>
+                            <input type="text" id="employeeId" name="employeeId" class="form-control" disabled>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="employeeName">Employee Name</label>
+                            <input type="text" id="employeeName" name="employeeName" class="form-control" disabled>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="oldPassword">Old Password</label>
+                            <input type="password" id="oldPassword" name="oldPassword" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="employeePassword">New Password</label>
+                            <input type="password" id="employeePassword" name="employeePassword" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reEmployeePassword">Re - enter New Password</label>
+                            <input type="password" id="reEmployeePassword" name="reEmployeePassword" class="form-control">
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="btn-change-password">Change Password</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="../js/main/main.js"></script>
+    <script>
+        $('#staff-page').siblings('a').removeClass('active');
+        $('#staff-page').addClass('active');
+        setPath("/user");
+        setTimeout(retrieveDataPaging("/user"), 1000);
+    </script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 package com.blibli.seagullpos.service;
 
 import com.blibli.seagullpos.dao.CategoryDAO;
-import com.blibli.seagullpos.model.CategoryModel;
+import com.blibli.seagullpos.model.ProductCategoryModel;
 import com.google.gson.Gson;
 
 import javax.servlet.ServletException;
@@ -24,7 +24,7 @@ public class CategoryService extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         categoryDAO = new CategoryDAO();
 
-        List<CategoryModel> listCategory = categoryDAO.getAllCategory();
+        List<ProductCategoryModel> listCategory = categoryDAO.getAllCategory();
 
         String listCategoryJSON = new Gson().toJson(listCategory);
         PrintWriter pw = response.getWriter();

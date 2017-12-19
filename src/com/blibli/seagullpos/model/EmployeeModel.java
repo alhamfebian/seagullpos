@@ -1,6 +1,5 @@
 package com.blibli.seagullpos.model;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -13,6 +12,7 @@ public class EmployeeModel {
     private String employeePassword;
     private String employeeRole;
     private Date lastLogin;
+    private SummaryList<HeaderTransactionModel> listEmployeeTransaction;
 
     public String getEmployeeId() {
         return employeeId;
@@ -72,5 +72,13 @@ public class EmployeeModel {
 
     public String getFormattedDate(){
         return new SimpleDateFormat("E dd-MM-yyyy hh:mm:ss").format(getLastLogin());
+    }
+
+    public SummaryList<HeaderTransactionModel> getListEmployeeTransaction() {
+        return listEmployeeTransaction;
+    }
+
+    public void setListEmployeeTransaction(SummaryList<HeaderTransactionModel> listEmployeeTransaction) {
+        this.listEmployeeTransaction = listEmployeeTransaction;
     }
 }

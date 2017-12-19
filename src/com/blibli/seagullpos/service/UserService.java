@@ -2,7 +2,9 @@ package com.blibli.seagullpos.service;
 
 import com.blibli.seagullpos.dao.EmployeeDAO;
 import com.blibli.seagullpos.model.EmployeeModel;
+import com.blibli.seagullpos.model.SummaryList;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import netscape.javascript.JSObject;
 
@@ -66,47 +68,52 @@ public class UserService extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         dao = new EmployeeDAO();
-        List<EmployeeModel> listUser = null;
+        SummaryList<EmployeeModel> employeeSummaryList = null;
 
-        String searchData = request.getParameter("query");
-        if(request.getPathInfo().equals("/totaldata")){
+        int page = 1;
+        if(request.getParameterMap().containsKey("page"))
+            page = Integer.parseInt(request.getParameter("page"));
 
-            int total = dao.getTotalUser(searchData);
-
-            String totalJSON = new Gson().toJson(total);
-            response.getWriter().write(totalJSON);
-        }else{
-            int page = Integer.parseInt(request.getParameter("page"));
-            int offset = (page - 1) * 10;
-            if(request.getPathInfo().equals("/userdata")){
-                listUser = dao.getPaginateUserList(offset);
-            }
-            else if(request.getPathInfo().equals("/search")){
-                listUser = dao.liveSearch(searchData, offset);
-            }
-
-            String listUserJSON = new Gson().toJson(listUser);
-            PrintWriter pw = response.getWriter();
-            pw.write(listUserJSON);
+        if(request.getPathInfo() == null){
+            employeeSummaryList = dao.getEmployeeSummaryList(page);
         }
+        else if(request.getPathInfo().equals("/search")){
+            String query = request.getParameter("query");
+            employeeSummaryList = dao.searchEmployeeSummaryList(query, page);
+
+        }
+
+        GsonBuilder builder = new GsonBuilder();
+        builder.serializeNulls();
+        builder.setPrettyPrinting();
+
+        Gson gson = builder.create();
+
+        String listUserJSON = gson.toJson(employeeSummaryList);
+        PrintWriter pw = response.getWriter();
+        pw.write(listUserJSON);
+
     }
 
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
         dao = new EmployeeDAO();
-
         BufferedReader br = request.getReader();
-
         String json = br.readLine();
         EmployeeModel employee = new Gson().fromJson(json, EmployeeModel.class);
 
-        String currentId = employee.getEmployeeId();
-        String role = employee.getEmployeeRole();
-        String newId = isRoleChange(currentId, role)
-                ? generateID(role.toLowerCase()) : employee.getEmployeeId();
+        if(request.getPathInfo().equals("/update/changepassword")){
+            dao.changePassword(employee.getEmployeeId(), employee.getEmployeePassword());
+        }
+        else{
+            String currentId = employee.getEmployeeId();
+            String role = employee.getEmployeeRole();
+            String newId = isRoleChange(currentId, role)
+                    ? generateID(role.toLowerCase()) : employee.getEmployeeId();
 
-        employee.setEmployeeId(newId);
+            employee.setEmployeeId(newId);
 
-        dao.updateUserGeneralData(employee, currentId);
+            dao.updateUserGeneralData(employee, currentId);
+        }
     }
 
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{

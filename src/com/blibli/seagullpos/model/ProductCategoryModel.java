@@ -1,6 +1,6 @@
 package com.blibli.seagullpos.model;
 
-public class CategoryModel {
+public class ProductCategoryModel {
     private int categoryID;
     private String categoryName;
 
