@@ -2,7 +2,9 @@ package com.blibli.seagullpos.service;
 
 import com.blibli.seagullpos.dao.ProductDAO;
 import com.blibli.seagullpos.model.ProductModel;
+import com.blibli.seagullpos.model.SummaryList;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,7 +16,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(name = "ProductService")
+@WebServlet("/product/*")
 public class ProductService extends HttpServlet {
 
     private ProductDAO productdao = null;
@@ -25,12 +27,19 @@ public class ProductService extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         productdao = new ProductDAO();
+        String currPage = request.getParameter("page");
+        int currentPage = (currPage == null) ? 1 : Integer.parseInt(currPage);
+        SummaryList<ProductModel> productSummaryList = productdao.getProductSummaryList(currentPage);
 
-        List<ProductModel> listProduct = productdao.getAllProduct();
 
-        String productJSON = new Gson().toJson(listProduct);
+        GsonBuilder builder = new GsonBuilder();
+        builder.serializeNulls();
+        builder.setPrettyPrinting();
+
+        Gson gson = builder.create();
+
+        String productJSON = gson.toJson(productSummaryList);
         PrintWriter pw = response.getWriter();
-
         pw.write(productJSON);
     }
 }

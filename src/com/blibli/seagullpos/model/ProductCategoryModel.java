@@ -1,15 +1,15 @@
 package com.blibli.seagullpos.model;
 
 public class ProductCategoryModel {
-    private int categoryID;
+    private int categoryId;
     private String categoryName;
 
-    public int getCategoryID() {
-        return categoryID;
+    public int getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategoryID(int categoryID) {
-        this.categoryID = categoryID;
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
     }
 
     public String getCategoryName() {

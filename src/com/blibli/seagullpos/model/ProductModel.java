@@ -7,6 +7,8 @@ public class ProductModel {
     private int productStock;
     private int productCategoryID;
     private String thumbnail;
+    private String productCategoryName;
+    private String productLocation;
 
     public String getProductID() {
         return productID;
@@ -54,5 +56,21 @@ public class ProductModel {
 
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public String getProductCategoryName() {
+        return productCategoryName;
+    }
+
+    public void setProductCategoryName(String productCategoryName) {
+        this.productCategoryName = productCategoryName;
+    }
+
+    public String getProductLocation() {
+        return productLocation;
+    }
+
+    public void setProductLocation(String productLocation) {
+        this.productLocation = productLocation;
     }
 }

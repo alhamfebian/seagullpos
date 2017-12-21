@@ -78,7 +78,14 @@ function retrieveDataPaging(pagingURL){
                 processMemberData(data.content);
                 $('#total-member').html('Total Member : ' + data.totalRecords + " member(s)");
             }
-
+            else if(url == "/product"){
+                //processProductData(data.content);
+                $('#total-product').html('Total Product : ' + data.totalRecords + " product(s)");
+            }
+            else if(url == "/productcategory"){
+                processProductCategoryData(data.content);
+                $('#total-product-category').html('Total Product Category : ' + data.totalRecords + " category(s)");
+            }
             paginateLink(data.totalRecords, data.pageSize, data.currentPage);
         },
         error : function () {
@@ -234,6 +241,31 @@ function processMemberData(data) {
     })
 }
 
+function processProductData(data) {
+
+}
+
+function processProductCategoryData(data){
+    var listProductCategory = data == null ? [] : data;
+
+    $("#product-category-data tbody tr").remove();
+
+    var tableData = $("#product-category-data tbody");
+
+    $.each(listProductCategory, function (key, value) {
+        tableData.append(
+            "<tr>" +
+            "<td class='col-sm-1 not-editable' data-category-id='" + value.categoryId + "'>" + value.categoryId + "</td>" +
+            "<td class='col-sm-9 editable' data-category-name='" + value.categoryName + "'>" + value.categoryName + "</td>" +
+            "<td class='col-sm-2 action-icon'>" +
+            "<span class='glyphicon glyphicon-pencil icon-margin cursor-point text-success icon-update'></span>" +
+            "<span class='glyphicon glyphicon-trash icon-margin cursor-point text-warning icon-delete'></span>" +
+            "</td>" +
+            "</tr>"
+        )
+    })
+}
+
 function paginateLink(total ,limit, currentPage, currentURL) {
     var numberOfLinks = Math.ceil(total / limit);
     var paginate = $('.pagination');
@@ -241,7 +273,7 @@ function paginateLink(total ,limit, currentPage, currentURL) {
     var next = (currentPage == numberOfLinks) ? numberOfLinks : (currentPage + 1);
     var pageURL = setPagingLink(currentURL);
 
-    console.log(total + " " + pageURL);
+    console.log(currentPage + " " + pageURL);
 
     paginate.empty();
     for(var i = 1; i <= numberOfLinks; i++){
@@ -312,6 +344,27 @@ $("#btn-change-password").click(function (e) {
     if(true){
         changePassword(employeeId, employeePassword);
     }
+});
+
+$("#btn-add-category").click(function (e) {
+   e.preventDefault();
+
+   var data = $('#add-category').serialize();
+
+   if(true){
+       $.ajax({
+           url : "/productcategory",
+           type : "POST",
+           data : data,
+           success : function () {
+                retrieveDataPaging("/productcategory");
+           },
+           error : function () {
+               alert("fail");
+           }
+       });
+   }
+
 });
 
 $(".list-table-data").on("click", ".icon-update", function () {

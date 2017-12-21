@@ -41,7 +41,7 @@ public class CategoryDAO {
         List<ProductCategoryModel> listCategory = new ArrayList<>();
         while(rs.next()){
             ProductCategoryModel category = new ProductCategoryModel();
-            category.setCategoryID(rs.getInt("productcategoryid"));
+            category.setCategoryId(rs.getInt("productcategoryid"));
             category.setCategoryName(rs.getString("productcategoryname"));
             listCategory.add(category);
         }
