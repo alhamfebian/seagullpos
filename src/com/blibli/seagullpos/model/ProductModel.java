@@ -1,21 +1,21 @@
 package com.blibli.seagullpos.model;
 
 public class ProductModel {
-    private String productID;
+    private String productId;
     private String productName;
     private int productPrice;
     private int productStock;
-    private int productCategoryID;
+    private int productCategoryId;
     private String thumbnail;
     private String productCategoryName;
     private String productLocation;
 
-    public String getProductID() {
-        return productID;
+    public String getProductId() {
+        return productId;
     }
 
-    public void setProductID(String productID) {
-        this.productID = productID;
+    public void setProductId(String productId) {
+        this.productId = productId;
     }
 
     public String getProductName() {
@@ -42,12 +42,12 @@ public class ProductModel {
         this.productStock = productStock;
     }
 
-    public int getProductCategoryID() {
-        return productCategoryID;
+    public int getProductCategoryId() {
+        return productCategoryId;
     }
 
-    public void setProductCategoryID(int productCategoryID) {
-        this.productCategoryID = productCategoryID;
+    public void setProductCategoryId(int productCategoryId) {
+        this.productCategoryId = productCategoryId;
     }
 
     public String getThumbnail() {

@@ -79,12 +79,13 @@ function retrieveDataPaging(pagingURL){
                 $('#total-member').html('Total Member : ' + data.totalRecords + " member(s)");
             }
             else if(url == "/product"){
-                //processProductData(data.content);
+                processProductData(data.content);
                 $('#total-product').html('Total Product : ' + data.totalRecords + " product(s)");
             }
             else if(url == "/productcategory"){
                 processProductCategoryData(data.content);
                 $('#total-product-category').html('Total Product Category : ' + data.totalRecords + " category(s)");
+                setProductCategoryOption();
             }
             paginateLink(data.totalRecords, data.pageSize, data.currentPage);
         },
@@ -108,6 +109,26 @@ function insertData(data){
     })
 }
 
+function insertDataWithFile(data, url){
+    $.ajax({
+        url : url,
+        type : "POST",
+        data : data,
+        enctype : "multipart/form-data",
+        processData: false,
+        contentType: false,
+        cache: false,
+        success : function () {
+            alert("success");
+            retrieveDataPaging(url);
+        },
+        error : function () {
+            alert("error");
+        }
+
+    })
+}
+
 function searchData(pageURL) {
     console.log(pageURL);
     $.ajax({
@@ -115,12 +136,18 @@ function searchData(pageURL) {
         dataType : "JSON",
         type : "GET",
         success : function (data) {
+            console.log(data);
             if(url == "/user"){
                 processUserData(data.content);
                 $('#total-user').html('Total User : ' + data.totalRecords + " user(s)");
             }else if(url == "/member"){
                 processMemberData(data.content);
                 $('#total-member').html('Total Member : ' + data.totalRecords + " member(s)");
+            }else if(url == "/product"){
+                $('#total-product').html('Total Product : ' + data.totalRecords + " product(s)");
+            }else if(url == "/productcategory"){
+                processProductCategoryData(data.content);
+                $('#total-product-category').html('Total Product Category : ' + data.totalRecords + " category(s)");
             }
             paginateLink(data.totalRecords, data.pageSize, data.currentPage, pageURL);
         },
@@ -167,6 +194,19 @@ function changePassword(employeeId, newPassword){
 function deleteData(id){
     $.ajax({
         url : url + "/delete?id=" + id,
+        type : "DELETE",
+        success : function () {
+            retrieveDataPaging(url);
+        },
+        error : function () {
+            alert("error");
+        }
+    })
+}
+
+function deleteDataWithFile(id, filePath){
+    $.ajax({
+        url : url + "/delete?id=" + id + "&file=" + filePath,
         type : "DELETE",
         success : function () {
             retrieveDataPaging(url);
@@ -242,7 +282,32 @@ function processMemberData(data) {
 }
 
 function processProductData(data) {
+    var listProduct = data == null ? [] : data;
 
+    $("#product-data tbody tr").remove();
+
+    var tableData = $("#product-data tbody");
+
+    $.each(listProduct, function (key, value) {
+        var imagePath = "../../image/" + value.thumbnail;
+        console.log(imagePath);
+        tableData.append(
+            "<tr>" +
+            "<td class='col-sm-2 not-editable' data-product-id='" + value.productId + "'>" + value.productId + "</td>" +
+            "<td class='col-sm-1 editable' data-thumbnail='" + value.thumbnail + "'>" +
+            "<img src='" + imagePath + "' alt='" + value.productName + "' class='img-thumbnail img-responsive' style='max-width: 75%'></td>" +
+            "<td class='col-sm-2 editable' data-product-name='" + value.productName + "'>" + value.productName + "</td>" +
+            "<td class='col-sm-1 editable' data-product-category-name='" + value.productCategoryName + "'>" + value.productCategoryName + "</td>" +
+            "<td class='col-sm-2 editable-num' data-product-stock='" + value.productStock + "'>" + value.productStock +"</td>" +
+            "<td class='col-sm-1 editable-num' data-product-price='" + value.productPrice + "'>" + value.productPrice + "</td>" +
+            "<td class='col-sm-1 editable' data-product-location='" + value.productLocation + "'>" + value.productLocation + "</td>" +
+            "<td class='col-sm-1 action'>" +
+            "<span class='glyphicon glyphicon-pencil icon-margin cursor-point text-success icon-update'></span>" +
+            "<span class='glyphicon glyphicon-trash cursor-point text-warning icon-margin icon-delete'></span>" +
+            "</td>" +
+            "</tr>"
+        )
+    })
 }
 
 function processProductCategoryData(data){
@@ -346,6 +411,27 @@ $("#btn-change-password").click(function (e) {
     }
 });
 
+function setProductCategoryOption() {
+    $.ajax({
+        url: "/productcategory/getall",
+        dataType: "JSON",
+        type: "GET",
+        success: function (data) {
+            var select = $('#productCategoryId');
+            select.empty();
+            select.append("<option value='-1'>Select your caterogry ..</option>");
+            $.each(data, function (key, value) {
+                select.append(
+                    "<option value='" + value.categoryId + "'>" + value.categoryName + "</option>"
+                );
+            })
+        },
+        error: function () {
+            alert("haha");
+        }
+    });
+}
+
 $("#btn-add-category").click(function (e) {
    e.preventDefault();
 
@@ -358,6 +444,7 @@ $("#btn-add-category").click(function (e) {
            data : data,
            success : function () {
                 retrieveDataPaging("/productcategory");
+                setProductCategoryOption();
            },
            error : function () {
                alert("fail");
@@ -436,12 +523,14 @@ $(".list-table-data").on("click", "#cancel-update", function () {
 });
 
 $(".list-table-data").on("click", ".icon-delete" ,function () {
-
     var tr = $(this).parent().parent();
-
     var id = tr.find("td:first").text();
-    console.log(id);
-    deleteData(id);
+    if(url === "/product"){
+        var path = tr.find("img").parent().data("thumbnail");
+        deleteDataWithFile(id, path);
+    }else{
+        deleteData(id);
+    }
 });
 
 $("#staff-data").on("click", "#icon-password-user", function () {
@@ -452,4 +541,16 @@ $("#staff-data").on("click", "#icon-password-user", function () {
 
     $('#employeeId').val(staffId);
     $('#employeeName').val(staffName);
+});
+
+$('#btn-add-product').click(function (e) {
+
+    e.preventDefault();
+
+    var form = $('#add-product');
+    var data = new FormData(form[0]);
+
+    if(true){
+        insertDataWithFile(data, "/product");
+    }
 });

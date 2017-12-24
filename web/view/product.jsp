@@ -81,16 +81,16 @@
                         <div role="tabpanel" class="tab-pane fade in active" id="product">
                             <span id="total-product">Total Product : </span>
                             <div class="table-responsive">
-                                <table class="table table-bordered list-table-data" id="product-data">
+                                <table class="table list-table-data" id="product-data">
                                     <thead>
                                     <tr>
-                                        <td class="col-sm-1">Id</td>
-                                        <td class="col-sm-2">Name</td>
-                                        <td class="col-sm-2">Email</td>
-                                        <td class="col-sm-1">Phone Number</td>
-                                        <td class="col-sm-1">Total Transaction</td>
-                                        <td class="col-sm-1">Total Point</td>
-                                        <td class="col-sm-2">Register Date</td>
+                                        <td class="col-sm-2">Id</td>
+                                        <td class="col-sm-2">Thumbnails</td>
+                                        <td class="col-sm-2">Product Name</td>
+                                        <td class="col-sm-1">Product Category</td>
+                                        <td class="col-sm-1">Stock</td>
+                                        <td class="col-sm-2">Price</td>
+                                        <td class="col-sm-1">Location</td>
                                         <td class="col-sm-1">Action</td>
                                     </tr>
                                     </thead>
@@ -136,6 +136,73 @@
         </div>
     </div>
 
+    <div class="modal fade" id="addProductModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="addProductLabel">Add Product</h4>
+                </div>
+
+                <div class="modal-body">
+                    <form id="add-product" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="productName">Product Name</label>
+                            <input type="text" name="productName" id="productName" class="form-control" placeholder="Product Name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="productCategoryId">Product Category</label>
+                            <select name="productCategoryId" id="productCategoryId" class="form-control">
+                                <option value="-">Select Category</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-md-6">
+                                <label for="productStock">Product Stock</label>
+                                <input type="number" name="productStock" id="productStock" class="form-control" value="1" min="1">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="productPrice">Product Price</label>
+                                <div class="input-group">
+                                    <span class="input-group-addon">Rp</span>
+                                    <input type="number" name="productPrice" id="productPrice" class="form-control" value="1000" min="1000">
+                                    <span class="input-group-addon">.00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="productThumbnail" class="col-sm-12">Product Thumbnail</label>
+                            <div class="col-sm-3">
+                                <label class="btn btn-primary" style="display: block">
+                                    Browse <input type="file"
+                                                  name="productThumbnail"
+                                                  id="productThumbnail"
+                                                  onchange="$('#file-name').html(this.files[0].name)"
+                                                  hidden>
+                                </label>
+                            </div>
+                            <div class="col-sm-9">
+                                <span id="file-name">No File Selected ...</span>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="btn-add-product">Add Product</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="addProductCategoryModal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -168,11 +235,16 @@
         $('#product-page').siblings('a').removeClass('active');
         $('#product-page').addClass('active');
 
+        setProductCategoryOption();
+
+        setPath("/product");
+        setTimeout(retrieveDataPaging("/product"), 1000);
 
 
         $('#product-tab').click(function () {
             url = "/product";
-
+            setPath(url);
+            retrieveDataPaging(url);
         });
 
         $('#product-category-tab').click(function () {

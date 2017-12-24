@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 @WebServlet("/productcategory/*")
 public class ProductCategoryService extends HttpServlet {
@@ -31,11 +32,8 @@ public class ProductCategoryService extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        SummaryList<ProductCategoryModel> productCategorySummaryList = null;
         productCategoryDAO = new ProductCategoryDAO();
-        String currPage = request.getParameter("page");
-        int currentPage = currPage == null ? 1 : Integer.parseInt(currPage);
-        SummaryList<ProductCategoryModel> productCategorySummaryList = productCategoryDAO.getProductCategorySummaryList(currentPage);
         PrintWriter pw = response.getWriter();
 
         GsonBuilder builder = new GsonBuilder();
@@ -43,6 +41,23 @@ public class ProductCategoryService extends HttpServlet {
         builder.setPrettyPrinting();
 
         Gson gson = builder.create();
+        String currPage = request.getParameter("page");
+        int currentPage = currPage == null ? 1 : Integer.parseInt(currPage);
+
+        if(request.getPathInfo() == null){
+            productCategorySummaryList = productCategoryDAO.getProductCategorySummaryList(currentPage);
+        }
+        else if(request.getPathInfo().equals("/search")){
+            String query = request.getParameter("query");
+            productCategorySummaryList = productCategoryDAO.getSearchProductCategory(currentPage, query);
+        }
+        else if(request.getPathInfo().equals("/getall")){
+            List<ProductCategoryModel> listCategory = productCategoryDAO.getListProductCategory();
+            String categoryJSON = gson.toJson(listCategory);
+            pw.write(categoryJSON);
+            return;
+        }
+
         String productCategoryJSON = gson.toJson(productCategorySummaryList);
 
         pw.write(productCategoryJSON);

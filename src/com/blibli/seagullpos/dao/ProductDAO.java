@@ -40,21 +40,30 @@ public class ProductDAO {
 
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) {
+                try {
+                    ps.close();
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
         }
         return listProduct;
     }
 
     public boolean insertProduct(ProductModel product){
         String query = "INSERT INTO product " +
-                "(productid, productcategoryid, productprice, productprice, productstock, productthumbnail, productlocation) " +
+                "(productid, productcategoryid, productName, productprice, productstock, productthumbnail, productlocation) " +
                 "VALUES " +
                 "(?, ?, ?, ?, ?, ?, ?)";
         boolean insertStatus = false;
         try{
             connection = ConnectionManager.createConnection();
             ps = connection.prepareStatement(query);
-            ps.setString(1, product.getProductID());
-            ps.setInt(2, product.getProductCategoryID());
+            ps.setString(1, product.getProductId());
+            ps.setInt(2, product.getProductCategoryId());
             ps.setString(3, product.getProductName());
             ps.setInt(4, product.getProductPrice());
             ps.setInt(5, product.getProductStock());
@@ -64,6 +73,15 @@ public class ProductDAO {
             insertStatus = ps.execute();
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) {
+                try {
+                    ps.close();
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
         }
         return insertStatus;
     }
@@ -83,18 +101,27 @@ public class ProductDAO {
         try {
             connection = ConnectionManager.createConnection();
             ps = connection.prepareStatement(query);
-            ps.setString(1, product.getProductID());
-            ps.setInt(2, product.getProductCategoryID());
+            ps.setString(1, product.getProductId());
+            ps.setInt(2, product.getProductCategoryId());
             ps.setString(3, product.getProductName());
             ps.setInt(4, product.getProductPrice());
             ps.setInt(5, product.getProductStock());
             ps.setString(6, product.getThumbnail());
             ps.setString(7, product.getProductLocation());
-            ps.setString(8, product.getProductID());
+            ps.setString(8, product.getProductId());
 
             updateStatus = ps.execute();
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) {
+                try {
+                    ps.close();
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
         }
         return updateStatus;
     }
@@ -109,6 +136,15 @@ public class ProductDAO {
             deleteStatus = ps.execute();
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) {
+                try {
+                    ps.close();
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
         }
         return deleteStatus;
     }
@@ -135,6 +171,15 @@ public class ProductDAO {
 
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) {
+                try {
+                    ps.close();
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
         }
         return listProduct;
     }
@@ -151,6 +196,15 @@ public class ProductDAO {
             }
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) {
+                try {
+                    ps.close();
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
         }
         return totalProduct;
     }
@@ -175,6 +229,15 @@ public class ProductDAO {
             }
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) {
+                try {
+                    ps.close();
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
         }
         return totalSearchData;
     }
@@ -184,13 +247,14 @@ public class ProductDAO {
 
         while(rs.next()){
             ProductModel product = new ProductModel();
-            product.setProductID(rs.getString("productid"));
-            product.setProductCategoryID(rs.getInt("productcategoryid"));
+            product.setProductId(rs.getString("productid"));
+            product.setProductCategoryId(rs.getInt("productcategoryid"));
             product.setProductName(rs.getString("productname"));
             product.setProductPrice(rs.getInt("productprice"));
             product.setProductStock(rs.getInt("productstock"));
             product.setThumbnail(rs.getString("productthumbnail"));
             product.setProductCategoryName(rs.getString("productcategoryname"));
+            product.setProductLocation(rs.getString("productlocation"));
             listProduct.add(product);
         }
         return listProduct;

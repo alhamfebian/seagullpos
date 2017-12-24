@@ -223,3 +223,25 @@ ul, li{
 .table-responsive > .table-bordered > tfoot > tr:last-child > td {
     border-bottom: 0;
 }
+[hidden] {
+    display: none !important;
+}
+
+.wrapper-order{
+    background-color: white;
+    margin-top: 10px;
+    padding-top: 10px;
+    overflow: hidden;
+}
+
+.wrapper-item{
+    background-color: white;
+    margin-top: 10px;
+    height: 140px;
+}
+
+.list-item{
+    margin-top: 10px;
+    height: 85%;
+    background-color: #fff;
+}

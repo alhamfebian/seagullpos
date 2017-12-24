@@ -19,6 +19,29 @@ public class ProductCategoryDAO {
 
     public ProductCategoryDAO(){}
 
+    public List<ProductCategoryModel> getListProductCategory(){
+        String query = "SELECT * FROM productcategory";
+
+        try{
+            connection = ConnectionManager.createConnection();
+            ps = connection.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
+            listProductCategory = processProductCategoryRow(rs);
+        }catch (SQLException e){
+            e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) {
+                try {
+                    ps.close();
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+        return listProductCategory;
+    }
+
     public List<ProductCategoryModel> getAllCategory(int limit, int offset){
         String query = "SELECT * FROM productcategory LIMIT ? OFFSET ?";
 
@@ -32,6 +55,15 @@ public class ProductCategoryDAO {
             listProductCategory = processProductCategoryRow(rs);
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) {
+                try {
+                    ps.close();
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
         }
         return listProductCategory;
     }
@@ -46,6 +78,15 @@ public class ProductCategoryDAO {
             insertStatus = ps.execute();
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) {
+                try {
+                    ps.close();
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
         }
         return insertStatus;
     }
@@ -66,6 +107,15 @@ public class ProductCategoryDAO {
             updateStatus = ps.execute();
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) {
+                try {
+                    ps.close();
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
         }
         return updateStatus;
     }
@@ -81,6 +131,15 @@ public class ProductCategoryDAO {
             deleteStatus = ps.execute();
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) {
+                try {
+                    ps.close();
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
         }
         return deleteStatus;
     }
@@ -97,19 +156,28 @@ public class ProductCategoryDAO {
             }
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) {
+                try {
+                    ps.close();
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
         }
         return totalData;
     }
 
     public List<ProductCategoryModel> searchProductCategory(String search, int limit, int offset) {
-        String query = "SELECT * FROM productcategory WHERE productcategoryname LIKE ? LIMIT ? OFFSET ?";
+        String query = "SELECT * FROM productcategory WHERE LOWER (productcategoryname) LIKE LOWER (?) LIMIT ? OFFSET ?";
 
         try{
             connection = ConnectionManager.createConnection();
             ps = connection.prepareStatement(query);
             ps.setString(1, "%" + search + "%");
-            ps.setInt(1, limit);
-            ps.setInt(2, offset);
+            ps.setInt(2, limit);
+            ps.setInt(3, offset);
 
             ResultSet rs = ps.executeQuery();
 
@@ -117,6 +185,15 @@ public class ProductCategoryDAO {
 
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) {
+                try {
+                    ps.close();
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
         }
 
         return listProductCategory;
@@ -136,6 +213,15 @@ public class ProductCategoryDAO {
             }
         }catch (SQLException e){
             e.printStackTrace();
+        }finally {
+            if(connection != null) ConnectionManager.closeConnection(connection);
+            if(ps != null) {
+                try {
+                    ps.close();
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
         }
         return totalData;
     }

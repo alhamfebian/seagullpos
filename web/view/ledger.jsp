@@ -9,8 +9,36 @@
 <html>
 <head>
     <title>SeagullPOS - Ledger</title>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="../css/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/custom/main.css">
+
+    <script src="../js/jquery-3.2.1.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
 </head>
 <body>
+    <%@ include file="../layout/topnav.jsp" %>
+
+    <div class="container-fluid" id="no-padding">
+        <div class="row">
+            <div class="col-md-3 col-lg-2">
+                <%@ include file="../layout/sidenav.jsp"%>
+            </div>
+            <div class="col-md-9 col-lg-10">
+                <div class="wrapper container-fluid">
+                    <h1>Ledger</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('#ledger-page').siblings('a').removeClass('active');
+        $('#ledger-page').addClass('active');
+    </script>
 
 </body>
 </html>

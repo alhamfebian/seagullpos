@@ -34,4 +34,16 @@ public class RandomId {
         System.out.println("String : " + newId);
         return Long.parseLong(newId);
     }
+
+    public static String generateProductId(int length, int spacingLength, char spacingChar){
+        StringBuilder sb = new StringBuilder();
+
+        for(int i = 1; i <= length; i++){
+            sb.append(getChar());
+            if(i % spacingLength == 0 && i != length){
+                sb.append(spacingChar);
+            }
+        }
+        return sb.toString();
+    }
 }
